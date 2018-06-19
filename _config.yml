@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: 不会写代码的架构师不是好程序猿
 subtitle:
 description:
 keywords:
-author: John Doe
+author: 老曹同学
 language:
-timezone:
+timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://blog.aosabook.cc
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -54,7 +54,7 @@ index_generator:
   order_by: -date
   
 # Category & Tag
-default_category: uncategorized
+default_category: 随笔
 category_map:
 tag_map:
 
@@ -73,9 +73,29 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: brewski
+theme_config:
+  logo:
+  copyright:
+    since: 2018
+    name: Chun
+    url: https://blog.aosabook.cc
+  menu:
+    Home: /
+    About: /about
+    GitHub: https://github.com/caochun/
+    RSS: /atom.xml
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/caochun/aosabook.cc.git
+  branch: gh-pages
+#  message: [message]
+  name: Chun
+  email: caochun@gmail.com
+#  extend_dirs: [extend directory]
+#  ignore_hidden: false # default is true
+#  ignore_pattern: regexp  # whatever file that matches the regexp will be ignored when deploying
+
