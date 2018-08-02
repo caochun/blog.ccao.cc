@@ -99,3 +99,22 @@ deploy:
 #  ignore_hidden: false # default is true
 #  ignore_pattern: regexp  # whatever file that matches the regexp will be ignored when deploying
 
+qiniu:
+  offline: false
+  sync: true
+  bucket: aosabook
+  # secret_file: sec/qn.json or C:
+  access_key: hf_OTa2nV0Taho84tpokRzn6Gm58mrjwu5QOPHGw
+  secret_key: -uwYx2tXAsUpSssc5YRH026F8qlzt_h5qCpC3OFK
+  dirPrefix: 
+  urlPrefix: http://pctozmwcv.bkt.clouddn.com/
+  up_host: http://upload.qiniu.com
+  local_dir: cdn
+  update_exist: true
+  image: 
+    folder: images
+    extend: 
+  js:
+    folder: js
+  css:
+    folder: css
