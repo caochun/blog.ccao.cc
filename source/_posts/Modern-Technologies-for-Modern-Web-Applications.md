@@ -142,6 +142,82 @@ public class HelloWorld extends HttpServlet {
 
 ## MVC Web
 
-细心的你会发现，其实Java Servlet和早起的CGI技术原理上是一样的：用户发送一个HTTP请求到服务器，服务器端执行一段代码，代码产生结果，渲染为HTML结构的页面返回给用户。但为什么现在你主要用的时Servlet技术开发Web应用而不是CGI呢？因为在
+细心的你会发现，其实Java Servlet和早起的CGI技术原理上是一样的：用户发送一个HTTP请求到服务器，服务器端执行一段代码，代码产生结果，渲染为HTML结构的页面返回给用户。但为什么现在你主要用的时Servlet技术开发Web应用而不是CGI呢？因为现在我们在Servlet之上构造了一层MVC的设计模式。
 
 
+之前那段Servlet代码中的`doGet()`函数是执行主体。
+
+``` java
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+      
+      // Set response content type
+      response.setContentType("text/html");
+
+      // Actual logic goes here.
+      PrintWriter out = response.getWriter();
+      out.println("<h1>" + message + "</h1>");
+   }
+```
+
+当然这个例子中的`doGet`执行的逻辑过于简单了点，一般来说，我们在这个函数中做三件事：
+
+1. 对方法参数对象`request`进行处理解析获得用户输入；
+2. 执行一段业务逻辑代码，对用户输入进行处理，得到一个业务层面的计算结果；
+3. 在方法参数对象`response`里讲计算结果用HTML的形式写入，让用户得到输出。
+
+如下图所示：
+
+{% qnimg webtech/doget.png %}
+
+直接这么写的问题在于所有的输入处理、业务计算和输出组织都是混在一起的，特别时输出部分需要通过字符串拼接等方式形成一个比较负责的html页面去展示结果，为维护带来了很大的不便。程序员一般HTML写得很难看，但会做页面设计的美工又不懂得Java语言，所以直接这样写Servlet不利于分工后协作，效率极低。因此出现了将用HTML进行结果渲染这个过程独立出来的技术，一般称之为模板引擎（Template Engine），例如[Freemarker](https://freemarker.apache.org/)、[Velocity](http://velocity.apache.org/)和[Thymeleaf](https://www.thymeleaf.org/)等，从概念上看这种技术就是将应用的表现层独立了出来，如下图。
+
+{% qnimg webtech/ui.png %}
+
+这么做的好处很显然，你可以单独写一个模板，让美工做得很漂亮，然后在代码运行时用运行结果去填充这个模板，渲染成一个页面，具体可以参考下面这个例子。
+
+
+``` html
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Sample Page</title>
+  </head>
+  <body>
+    <b>Time Now:</b> ${requestScope["time"]}
+  </body>
+</html>
+```
+
+``` java
+
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
+
+    request.setAttribute("time", new Date()); // 'time' would be  shown on JSP page             
+    RequestDispatcher view = request.getRequestDispatcher("WEB-INF/templates/sample.jsp");      
+    view.forward(request, response);
+}
+
+```
+
+这样一来程序员和美工就可以愉快地在一起工作了。但从程序员的角度来看，还有一部分问题没解决，就是用户输入参数的处理和业务逻辑计算代码还是在一起的，不能分别维护。因此我们再次进行分割，变成以下的样子：
+
+{% qnimg webtech/mvc.png %}
+
+
+我们将业务逻辑部分再切出来，用户请求发送过来驱动Servlet的某个`doGet`方法开始运行，方法内主要负责的事时解析获得用户输入内容，将输入交给一个核心部件进行计算处理获得结果后再将结果交给模板引擎进行渲染，所以这个Servlet虽然没有做最核心的计算和漂亮页面的展示，但它控制了整个执行过程，称之为“控制器”；控制器解析出的用户输入内容被交给第二个部分进行计算处理，这个部分实际上就是系统的核心，执行的是关键性的计算过程，并得到一个计算结果，我们称之为“模型”；用来渲染这个计算结果的展示部分称之为“视图”。
+
+仔细体会一下这样分割的好处，我想至少有这么几点：
+
+1. 其他都不变的情况下，如果有调整页面设计，只要改HTML模板就行了，代码不用动；
+2. 如果一个核心算法要改进，那该模型的实现就行了，其他都不用动；或者说如果某个计算过程有新的实现，那让控制器调用新的模型实现就行；
+3. 如果用户输入参数改了，那我们可以在控制器层面把参数变动处理了，其他部分可以不受影响。
+
+因此这样一来，你可以找三个人分别来干这三件事。这实际上是软件技术中一直孜孜以求的一个模板，叫做[“关注分离”(Separation of concerns，SOC)](https://zh.wikipedia.org/wiki/%E5%85%B3%E6%B3%A8%E7%82%B9%E5%88%86%E7%A6%BB)。
+
+下面开始进入正题：Spring MVC。
+
+## Spring

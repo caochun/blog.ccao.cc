@@ -118,3 +118,5 @@ qiniu:
     folder: js
   css:
     folder: css
+  ignoring_files:
+    - '**/.DS_Store'
