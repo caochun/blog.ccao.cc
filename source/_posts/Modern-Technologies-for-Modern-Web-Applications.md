@@ -221,3 +221,13 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 下面开始进入正题：Spring MVC。
 
 ## Spring
+
+Spring是一个开源框架，为简化企业级应用开发和运行管理而生。早期Spring指的是一个IoC(DI)和AOP容器框架，叫Spring Framework。关于IoC（Inversion of Control，中文叫“反转控制”）、DI（Dependency Injection，中文叫“依赖注入”）和AOP（Aspect-Oriented Programming，中文叫“面向切面编程”）等概念在后面逐步展开介绍。这些都是非常重要的软件技术概念。
+Spring目前成为了应用最广泛的Java开发框架，甚至连早期特别红火的EJB技术也基本完全没落了，主流的企业级应用十之八九都以Spring为平台，这主要是由于Spring在此核心框架基础之上衍生出了[很多项目](http://spring.io/projects)来提供面向应用开发的完整框架、工具等，被称之为"Spring全家桶"。
+
+{% qnimg webtech/spring.png %}
+
+
+
+
+
