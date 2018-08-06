@@ -228,6 +228,8 @@ Spring目前成为了应用最广泛的Java开发框架，甚至连早期特别�
 {% qnimg webtech/spring.png %}
 
 
+## Spring MVC
 
+上面说了，一个动态的Web应用较为合理的设计是分为模型（M）、视图（V）和控制器（C）三个部分。Spring在其核心框架Spring Framework中提供了MVC这种设计模式的Web应用开发支持。
 
 
