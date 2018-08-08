@@ -230,6 +230,22 @@ Spring目前成为了应用最广泛的Java开发框架，甚至连早期特别�
 
 ## Spring MVC
 
-上面说了，一个动态的Web应用较为合理的设计是分为模型（M）、视图（V）和控制器（C）三个部分。Spring在其核心框架Spring Framework中提供了MVC这种设计模式的Web应用开发支持。
+Spring在其核心框架Spring Framework中提供了Web应用开发支持。
+
+{% qnimg webtech/springframework.png %}
+
+Spring的Web支持开发MVC模式的Web应用。具体而言，Spring预先实现了一个特定的Servlet叫做`DispatcherServlet`，这个Servlet会根据用户的配置，将不同的请求（URL）转发给不同的代码（Controller）进行处理，Controller处理完得到结果将结果渲染到一个页面中返回给用户。
+
+{% qnimg webtech/springmvc.png %}
+
+这其中涉及到一些内部技术，例如`HandlerMapper`、`ViewResolver`等，但这些跟用户在业务层编程关系不大，所以目前无需了解得过细，原理知道即可。
+
+我们来看一个来自于Spring官方网站的具体例子--[Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/
+)。
+
+
+
+
+
 
 
