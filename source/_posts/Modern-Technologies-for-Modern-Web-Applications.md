@@ -240,12 +240,28 @@ Spring的Web支持开发MVC模式的Web应用。具体而言，Spring预先实�
 
 这其中涉及到一些内部技术，例如`HandlerMapper`、`ViewResolver`等，但这些跟用户在业务层编程关系不大，所以目前无需了解得过细，原理知道即可。
 
-我们来看一个来自于Spring官方网站的具体例子--[Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/
+快速学习一项具体技术的方法不是去买本很厚的书回来从头开始看，而是找个例子当葫芦，然后你照着画个瓢。国内很多热心人士也在网上po出很多例子，但一般而言各人在技术理解的层面上深度准确度都不尽相同，这些例子一般也不随着技术本身的发展而同步更新，因此还是尽量找权威机构的技术材料来看会比较好。Spring公司在其[官方网站](https://spring.io/)上提供了一系列很好的[教程](https://spring.io/guides)让开发人员可以快速了解技术，后面我们会讲到这中间的若干篇。
+
+我们先来看教程中关于Web应用的一个最简单例子--[Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/
 )。
 
+这篇教程中要我们用[git](https://git-scm.com/)工具获取示例代码。Git是一个目前最流行的版本控制工具，相比原来普遍使用的CVS、SVN等有很多优势。现在最热门的开源网站[Github](https://github.com/)实际上就是一个对上百万（可能上千万）个仓库进行管理、分享的系统。关于Git工具的使用可以看一下简要介绍，比如[这个](http://rogerdudler.github.io/git-guide/index.zh.html)。简言之，你现在先从<https://git-scm.com/>上下载git并安装，然后用clone命令获取代码。
 
+``` bash
+git clone https://github.com/spring-guides/gs-serving-web-content.git
+```
 
+然后进入代码仓库目录
+``` bash
+cd gs-serving-web-content
+```
 
+你会看到其中有`initial`和`complete`两个目录（和其他的一些文件目录）。教程想让你从一个工程的最初创建状态（`initial`中所含的内容）开始，一步一步操作，最后到达完成状态（`complete`中的内容）。为简单起见，我们就直接讲解一下后者，关于这个目录中的代码和资源文件怎么创建怎么编辑开发的过程可以仔细读教程。
 
+`complete`目录下存在多个各个文件夹和文件，其中`src`目录内是项目的源代码和相关资源文件，其他的则是用来对这些源代码和资源文件进行编译、连接、打包等处理过程的“构建工具”需要的内容。构建工具是一个把源代码生成可执行应用程序的过程自动化的程序（例如Android app生成apk）。如果你之前主要用eclipse开发，那可能觉得构建工具这个概念比较陌生，但构建工具这个概念和技术已经存在了几十年了，如果你在Unix/Linux系统下软件开发的或者在Unix/Linux下从别人开发的源代码进行软件安装的话，一定知道“Makefile”这个文件，这个文件实际上就是告诉`make`这个构建工具如何编译代码、如何最后生成可执行文件的一个配置文件，有兴趣的话可以读一下这篇[Make 命令教程](http://www.ruanyifeng.com/blog/2015/02/make.html)。我们在这个工程中以及以后的示例中都会使用构建工具来进行编译运行等操作，而不是用eclipse。也许你觉得这件事情挺难理解的，为什么不用eclipse呢？那我告诉你用构建工具的重要优势之一：它可以帮你进行依赖管理。我们在用eclipse开发的时候，通常都会用到第三方的一些库（Library），在eclipse中我们可以在项目配置页中指定一个目录作为Library，告诉eclipse要从那里面去搜索你所要用到的类，然后你可以从网上去下载一堆jar文件，放入这个Library文件夹中，但如果项目依赖的jar很多，这件事就会比较累，而且你引入的jar可能又以来其他jar，你还得把其他jar也下载下来放进去，更复杂的是每个jar还有版本，你要非常仔细地选择合适的版本，这就会让你很头疼。如果某个jar更新了你希望保持同步，那之前做过的事情又要重新来一遍。这就是手工进行依赖管理的过程。使用构建工具的话，这个过程就会自动化完成。互联网上有个网站<https://mvnrepository.com/>，这个网站上维护了1100万左右的jar包，你可以用构建工具随意来获取你所需要的jar，这个工具的名称叫[Maven]<https://maven.apache.org/>。`complete`目录下的`pom.xml`就是一个配置文件，告诉maven你依赖的jar包有哪些，你的代码怎么编译，编译后如何运行等等。`mvnw`和`mvnw.cmd`是两个用来运行maven的脚本文件，暂时可以不用管。另外`build.gradle`、`gradle`、`gradlew`和`gradlew.bat`是另外一套构建工具Gradle所需的配置和脚步。早期只有maven这个工具，后来有人觉得maven用xml作为配置文件太繁琐，所以开发了gradle，而gradle跟maven一样还是从mvnrepository搜索下载依赖，构建过程的原理也一样。所以目前我们简单点，只看maven，请从maven官方网站下载并安装maven工具，如果你在complete目录下运行以下命令正确了，说明你之前的这些步骤都做对了。
+
+``` bash
+mvn spring-boot:run
+```
 
 
