@@ -274,3 +274,46 @@ mvn spring-boot:run
 
 > Checkpoint: 完成这一步的话至少你的开发环境目前基本配置正确了。
 
+下面我们可以用IDE打开代码，推荐使用[IntelliJ IDEA](https://www.jetbrains.com/idea/)，当然这个开发工具是要钱的。不想买的话可以用微软发布的[Visual Studio Code](https://code.visualstudio.com/)（简称Code）。Code实际上只是个编辑器，不是集成开发环境，因为我们可以用maven进行自动化构建，所以用Code看代码写代码也就足够了。Code具有非常开放的架构，很多第三方的插件使得Code实际上非常强大，推荐使用。
+
+用Code打开`complete`目录，其中`src/main/java/`是代码所在目录，之所以有这个目录结构是maven工程的规范要求。工程名空间是`package hello`，所以`src/main/java/hello`是Java文件代码实际所在之处，包括`Application.java`和`GreetingController.java`
+
+``` java
+package hello;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
+``` java
+package hello;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class GreetingController {
+
+    @GetMapping("/greeting")
+    public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
+        model.addAttribute("name", name);
+        return "greeting";
+    }
+
+}
+```
+
+
+
+
