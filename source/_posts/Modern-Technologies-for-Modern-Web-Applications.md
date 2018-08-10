@@ -227,18 +227,21 @@ Spring目前成为了应用最广泛的Java开发框架，甚至连早期特别�
 
 {% qnimg webtech/spring.png %}
 
-
 ## Spring MVC
 
 Spring在其核心框架Spring Framework中提供了Web应用开发支持。
 
 {% qnimg webtech/springframework.png %}
 
+### 结构
+
 Spring的Web支持开发MVC模式的Web应用。具体而言，Spring预先实现了一个特定的Servlet叫做`DispatcherServlet`，这个Servlet会根据用户的配置，将不同的请求（URL）转发给不同的代码（Controller）进行处理，Controller处理完得到结果将结果渲染到一个页面中返回给用户。
 
 {% qnimg webtech/springmvc.png %}
 
 这其中涉及到一些内部技术，例如`HandlerMapper`、`ViewResolver`等，但这些跟用户在业务层编程关系不大，所以目前无需了解得过细，原理知道即可。
+
+### 示例工程及相关工具
 
 快速学习一项具体技术的方法不是去买本很厚的书回来从头开始看，而是找个例子当葫芦，然后你照着画个瓢。国内很多热心人士也在网上po出很多例子，但一般而言各人在技术理解的层面上深度准确度都不尽相同，这些例子一般也不随着技术本身的发展而同步更新，因此还是尽量找权威机构的技术材料来看会比较好。Spring公司在其[官方网站](https://spring.io/)上提供了一系列很好的[教程](https://spring.io/guides)让开发人员可以快速了解技术，后面我们会讲到这中间的若干篇。
 
@@ -264,35 +267,105 @@ cd gs-serving-web-content
 
 我们在这个工程中以及以后的示例中都会使用构建工具来进行编译运行等操作，而不是用eclipse。也许你觉得这件事情挺难理解的，为什么不用eclipse呢？那我告诉你用构建工具的重要优势之一：它可以帮你进行**依赖管理**。我们在用eclipse开发的时候，通常都会用到第三方的一些库（Library），在eclipse中我们可以在项目配置页中指定一个目录作为Library，告诉eclipse要从那里面去搜索你所要用到的类，然后你可以从网上去下载一堆jar文件，放入这个Library文件夹中，但如果项目依赖的jar很多，这件事就会比较累，而且你引入的jar可能又以来其他jar，你还得把其他jar也下载下来放进去，更复杂的是每个jar还有版本，你要非常仔细地选择合适的版本，这就会让你很头疼。如果某个jar更新了你希望保持同步，那之前做过的事情又要重新来一遍。这就是手工进行依赖管理的过程。使用构建工具的话，这个过程就会自动化完成。
 
-互联网上有个网站<https://mvnrepository.com/>，这个网站上维护了1100万左右的jar包，你可以用构建工具随意来获取你所需要的jar，这个工具的名称叫[Maven]<https://maven.apache.org/>。`complete`目录下的`pom.xml`就是一个配置文件，告诉maven你依赖的jar包有哪些，你的代码怎么编译，编译后如何运行等等。`mvnw`和`mvnw.cmd`是两个用来运行maven的脚本文件，暂时可以不用管。另外`build.gradle`、`gradle`、`gradlew`和`gradlew.bat`是另外一套构建工具Gradle所需的配置和脚步。早期只有maven这个工具，后来有人觉得maven用xml作为配置文件太繁琐，所以开发了gradle，而gradle跟maven一样还是从mvnrepository搜索下载依赖，构建过程的原理也一样。
+互联网上有个网站<https://mvnrepository.com/>，这个网站上维护了1100万左右的jar包，你可以用构建工具随意来获取你所需要的jar，这个工具的名称叫[Maven]<https://maven.apache.org/>。`complete`目录下的`pom.xml`就是一个配置文件，告诉Maven你依赖的jar包有哪些，你的代码怎么编译，编译后如何运行等等。`mvnw`和`mvnw.cmd`是两个用来运行Maven的脚本文件，暂时可以不用管。另外`build.gradle`、`gradle`、`gradlew`和`gradlew.bat`是另外一套构建工具Gradle所需的配置和脚步。早期只有Maven这个工具，后来有人觉得Maven用xml作为配置文件太繁琐，所以开发了gradle，而gradle跟Maven一样还是从mvnrepository搜索下载依赖，构建过程的原理也一样。
 
-所以目前我们简单点，只看maven，请从maven官方网站下载并安装maven工具，如果你在complete目录下运行以下命令正确了，说明你之前的这些步骤都做对了。
+### 构建并运行
+
+所以目前我们简单点，只看Maven，请从Maven官方网站下载并安装Maven工具，如果你在complete目录下运行以下命令正确了，说明你之前的这些步骤都做对了。
 
 ``` bash
 mvn spring-boot:run
 ```
 
+第一次运行的话可能需要等待很久，时间主要被Maven花在从网络上下载这个工程所需要的依赖文件。等待几分钟（网络慢的话可能需要十几分钟）后，这个应用就会运行起来。用浏览器访问`http://localhost:8080/`即可。首页上有链接引导你访问`http://localhost:8080/greeting`，得到`Hello, World!`这个结果页面，你也可以在url后面加上`name`参数，例如访问`http://localhost:8080/greeting?name=John`得到`Hello, John!`结果页面。
+
 > Checkpoint: 完成这一步的话至少你的开发环境目前基本配置正确了。
 
-下面我们可以用IDE打开代码，推荐使用[IntelliJ IDEA](https://www.jetbrains.com/idea/)，当然这个开发工具是要钱的。不想买的话可以用微软发布的[Visual Studio Code](https://code.visualstudio.com/)（简称Code）。Code实际上只是个编辑器，不是集成开发环境，因为我们可以用maven进行自动化构建，所以用Code看代码写代码也就足够了。Code具有非常开放的架构，很多第三方的插件使得Code实际上非常强大，推荐使用。
+显然，它运行起来看起来是个web工程，而且你如果足够细心的话会发现刚才运行的时候控制台日志里有这样的几行：
 
-用Code打开`complete`目录，其中`src/main/java/`是代码所在目录，之所以有这个目录结构是maven工程的规范要求。工程名空间是`package hello`，所以`src/main/java/hello`是Java文件代码实际所在之处，包括`Application.java`和`GreetingController.java`
-
-``` java
-package hello;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class Application {
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
-}
 ```
+2018-08-10 13:50:40.558  INFO 1444 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2018-08-10 13:50:40.584  INFO 1444 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2018-08-10 13:50:40.584  INFO 1444 --- [  restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/8.5.31
+```
+
+这意味着刚才的运行过程中Tomcat应用服务器和Servlet引擎被启动。但跟之前开发Web应用不一样，我们没有把工程打包为war然后部署到一个独立运行的Tomcat，这个工程像是直接自动完成了打包war、启动tomcat、部署war这些所有步骤。
+
+
+我们打开代码看看这到底是怎么回事吧。
+
+### 代码解释
+
+我们可以用IDE打开代码，推荐使用[IntelliJ IDEA](https://www.jetbrains.com/idea/)，当然这个开发工具是要钱的。不想买的话可以用微软发布的[Visual Studio Code](https://code.visualstudio.com/)（简称Code）。Code实际上只是个编辑器，不是集成开发环境，因为我们可以用Maven进行自动化构建，所以用Code看代码写代码也就足够了。Code具有非常开放的架构，很多第三方的插件使得Code实际上非常强大，推荐使用。
+
+用Code打开`complete`目录，其中`src/main/java/`是代码所在目录，之所以有这个目录结构是Maven工程的规范要求。工程名空间是`package hello`，所以`src/main/java/hello`是Java文件代码实际所在之处，包括`Application.java`和`GreetingController.java`。
+
+首先我们要看的不是这些java文件，而是位于`complete`目前下的`pom.xml`文件。POM是Project Object Model的缩写，代表工程对象模型，也就关于工程和各种配置细节的信息，Maven使用这些信息构建工程。详细信息可以参考<http://wiki.jikexueyuan.com/project/maven/pom.html>。
+
+``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.springframework</groupId>
+    <artifactId>gs-serving-web-content</artifactId>
+    <version>0.1.0</version>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+其中
+
+1. `<groupId>`、`<artifactId>`、`<version>`三个tag合起来说，当前这个工程是`org.springframework`这个组织的，工程名叫`gs-serving-web-content`，版本是`0.1.0`，这很好理解；
+2. `<dependencies>`这个tag里定义了当前工程直接依赖的第三方库（或称为“包”），例如当前工程依赖于`org.springframework.boot`组织开发的`spring-boot-starter-thymeleaf`这个库，Maven工具根据这个信息会自动从mvnrepository里下载对应的jar，你也可以直接访问[网页](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf)；
+3. `<properties>`里可以定义一组属性（变量值）；
+4. `<build>`下的`<plugins>`里定义当前工程构建需要用到的插件，这里我们用了一个`spring-boot-maven-plugin`插件，正是这个插件使我们能运行`mvn spring-boot:run`；
+5. `<parent>`标签定义了这个POM的上一级（父）POM，上一级POM中定义的属性、依赖、插件等都可以被复用。
+
+
+
+然后看一下`GreetingController`这个类。
 
 ``` java
 package hello;
@@ -314,6 +387,94 @@ public class GreetingController {
 }
 ```
 
+这个类也很简单，定义了一个`greeting`方法，该方法上有个注解（Annotation），其含义比较直观：
+
+1. 为方法`greeting`标上注解`@GetMapping("/greeting")`意味着当前这个方法负责处理用户发来的`GET /greeting`这个请求；
+2. 为参数`name`标上注解`@RequestParam(name="name", required=false, defaultValue="World")`意味着从请求中取查询参数`name`作为这个参数的值，缺省为`World`。
+3. 为类`GreetingController`标上注解`@Controller`意味着当前这个类是一个**控制器**;
+
+结合我们前面说的MVC的技术理念，有过Web开发经验的就应该看得懂，这就是一个可以响应用户的一个具体请求的Web应用控制器类。然后看`Application.java`。
+
+``` java
+package hello;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
+这段代码刚学Java时你就能读懂，这个类里只有一个`main`函数，调用了`SpringApplication`类的`run`方法。
+
+那这两个类存在了为什么我们运行`mvn spring-boot:run`就能启动出Tomcat并部署一个包含了`GreetingController`这个控制器的war呢？这一切的神奇来自于`Application`类上的`@SpringBootApplication`这个注解。这个注解解释起来就费劲了，它实际上是Spring三年前才发布的一项新技术：[Spring Boot](https://spring.io/projects/spring-boot)。其设计目的是用来简化新Spring应用的初始搭建以及开发过程。该框架使用了特定的方式来进行配置，从而使开发人员不再需要定义样板化的配置。平时如果我们需要搭建一个web项目的时候需要配置web.xml、配置数据库连接、配置事务、配置加载配置文件的读取、配置日志文件等等，但是如果使用spring boot呢？很简单，我仅仅只需要非常少的几个配置就可以迅速方便的搭建起来一套web项目。
+
+**简单而言，加了`@SpringBootApplication`这个注解后，Spring底层系统会根据我们的项目信息来帮你进行自动化的配置，比如我们在POM中写了对`spring-boot-starter-web`的依赖，Spring会猜到我们是要开发一个Web应用，因此帮我们自动启动了Tomcat服务器。同时Spring发现有一个类标注了`@Controller`，说明这是个控制器类，Spring会自动创建这个类的对象（这里用到了Spring Framework中的Bean构件管理和依赖注入等底层技术），并自动为Tomcat里运行的DispatcherServlet配置请求转发规则，让所有`GET /greeting`请求被`GreetingController`这个控制器的`greeting`函数所处理。**
+
+
+上面说的`mvn spring-boot:run`这种方式可以启动当前Spring Boot工程的运行，也可以这样：
+
+``` bash
+mvn package
+cd target
+java -jar gs-serving-web-content-0.1.0.jar
+```
+
+`mvn package`把当前这个工程编译，打包为一个jar，jar文件存放在`target`目录下，注意这个jar可以独立运行。这个jar中包含了当前这个应用运行所需的所有东西，只要有java环境就能运行这个应用，这为后面支撑**微服务**架构提供了一个完美的技术方案。
+
+> 关于微服务，我们会在“{% post_link Building-Cloud-Applications-with-Microserivce-Architecture 基于微服务架构开发面向云计算的应用系统 %}”这篇中详细说。
+
+这个例子中的`greeting`函数的第二个参数`model`就是用来存放模型对象的，方法返回一个字符串`greeting`，即告诉系统greeting函数结束后，用名字叫`greeting`的视图模板（`resources/templates/greeting.html`）渲染`model`里的数据，然后返回给用户。这过程跟早期的Struts框架处理流程很接近，此处不赘述。
+
+这个例子很简单，其中主要的特点在于用了Spring Boot来自动配置整个应用。下面看一个经典的更完整的例子。
+
+## Spring PetClinic
+
+Java技术流行了很多年，特别是EJB技术推动了Java成为企业应用开发的首选。当年Sun公司（现在已经被Oracle收购）为了让程序员有效快速了解EJB技术体系，给了一个很典型的示例工程（Java Pet Store，一个在线的宠物商店）。Java EJB技术（现在叫Java EE）目前逐步没落了，Spring快速流行起来，并用一个类似的示例工程来方便技术学习。这个工程叫Pet Clinic（宠物医院）。
+
+{% qnimg webtech/petclinic.png %}
+
+这个例子很有代表性，并且有很多版本来展示不同的技术，甚至微服务架构的应用开发也是基于这个例子来讲解。所以请先熟悉一下这个例子本身。
+
+``` bash
+git clone https://github.com/spring-projects/spring-petclinic.git
+cd spring-petclinic
+mvn spring-boot:run
+```
+
+
+### 领域模型
 
 
 
+## 前后端分离架构
+
+<https://github.com/spring-petclinic/spring-petclinic-rest.git>
+
+### REST
+
+
+# 前端技术
+
+## 发展历程
+
+### 早期
+
+
+### Angular
+
+https://github.com/spring-petclinic/spring-petclinic-angularjs.git
+
+https://github.com/spring-petclinic/spring-petclinic-angular
+
+### ReactJS
+
+https://github.com/spring-petclinic/spring-petclinic-reactjs
+
+### VUE
