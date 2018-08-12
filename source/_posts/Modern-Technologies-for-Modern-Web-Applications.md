@@ -577,6 +577,14 @@ https://github.com/spring-petclinic/spring-petclinic-rest
 
 跟前一个版本相比，主要区别在于原来那些Controller上的注解从`@Controller`变为了`@RestController`。简单来说`@Controller`意味着这个Controller返回的是一个View，将其渲染后返回给用户，而`@RestController`意味着这个Controller返回的是值（对象），这个值（对象）一般转为Json格式后直接输出给用户。
 
+拿到这个数据对象后，如何将这个结果展示给用户看那就是另一个问题了，这个问题就是后面我们会继续介绍的前端工程。当前这个工程本身比较容易理解，其中引入了一个新工具，叫Swagger。你可以按readme.md里所说运行起改工程后访问这个URL
+
+http://localhost:9966/petclinic/swagger-ui.html
+
+你会发现一个漂亮的页面，这个页面上列出了各个Controller实现的用户可调用的接口，你甚至可以直接在这个页面上为接口编写文档，并且还能直接测试这个接口。这是个很有用的工具！
+
+总体来看，这个不渲染页面呈现结果给用户的工程直接返回了数据，因此它运行起来后整个工程提供了一组接口给用户去调用，这组接口是这个系统实现的外部服务。接口这个概念大家都知道，为什么这些接口要叫REST接口（REST API）呢？
+
 ### REST
 
 # 前端技术
