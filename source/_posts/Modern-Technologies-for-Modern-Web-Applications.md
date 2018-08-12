@@ -480,7 +480,10 @@ mvn spring-boot:run
 
 https://github.com/spring-petclinic/spring-framework-petclinic
 
-为什么说原来的不好呢？我们来看看这个版本的代码有什么改变。
+为什么说原来的不好呢？我们来看看这个版本的代码有什么改变，主要包括两点：
+
+- 在`Controller`和`Repository`中间封装了一层`Service`；
+- `Repository`层
 
 
 
