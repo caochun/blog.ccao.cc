@@ -575,17 +575,158 @@ Spring Data JPA确实是很强大，可以看一下[官方文档](https://docs.s
 https://github.com/spring-petclinic/spring-petclinic-rest
 
 
-跟前一个版本相比，主要区别在于原来那些Controller上的注解从`@Controller`变为了`@RestController`。简单来说`@Controller`意味着这个Controller返回的是一个View，将其渲染后返回给用户，而`@RestController`意味着这个Controller返回的是值（对象），这个值（对象）一般转为Json格式后直接输出给用户。
+跟前一个版本相比，主要区别在于原来那些Controller上的注解从`@Controller`变为了`@RestController`。简单来说`@Controller`意味着这个Controller返回的是一个View，将其渲染后返回给用户，而`@RestController`意味着这个Controller返回的是值（对象），这个值（对象）一般转为Json格式后直接输出给用户。另外工程中加入了用户认证（包括跨域）和数据序列化技术等。这些后续补充解释。
 
-拿到这个数据对象后，如何将这个结果展示给用户看那就是另一个问题了，这个问题就是后面我们会继续介绍的前端工程。当前这个工程本身比较容易理解，其中引入了一个新工具，叫Swagger。你可以按readme.md里所说运行起改工程后访问这个URL
+拿到这个数据对象后，如何将这个结果展示给用户看那就是另一个问题了，这个问题就是后面我们会继续介绍的前端工程。这个不渲染页面呈现结果给用户的工程直接返回了数据，整个工程提供了一组接口来为用户提供获得信息的服务，这组接口跟你一般编程时候调用的函数是一样的概念，差别只是你给他传入的参数和得到的结果采用的是[JSON](https://www.json.org/)这种格式（也可以用别的数据格式，但JSON目前是最流行的轻量级格式）。
+
+当前这个工程本身比较容易理解，其中引入了一个新工具，叫[Swagger](https://swagger.io/)。你可以按readme.md里所说运行起改工程后访问这个URL
 
 http://localhost:9966/petclinic/swagger-ui.html
 
 你会发现一个漂亮的页面，这个页面上列出了各个Controller实现的用户可调用的接口，你甚至可以直接在这个页面上为接口编写文档，并且还能直接测试这个接口。这是个很有用的工具！
 
-总体来看，这个不渲染页面呈现结果给用户的工程直接返回了数据，因此它运行起来后整个工程提供了一组接口给用户去调用，这组接口是这个系统实现的外部服务。接口这个概念大家都知道，为什么这些接口要叫REST接口（REST API）呢？
+{% qnimg webtech/swagger.png %}
+
 
 ### REST
+
+接口这个概念大家都知道，为什么我们现在需要把开发出来的这些接口叫做REST接口呢？实际上我们在前面的几个例子中我们写的Controller里的方法就是接口，只不过这些接口调用后用户得到的结果会是渲染过的一个页面。这其中有个问题，就是接口的名称是怎么设计的。看一下`spring-framework-petclinic`工程中的`OwerController`里的两个方法：
+
+``` java
+    @RequestMapping(value = "/owners/{ownerId}/edit", method = RequestMethod.GET)
+    public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
+        Owner owner = this.clinicService.findOwnerById(ownerId);
+        model.addAttribute(owner);
+        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+    }
+
+    @RequestMapping(value = "/owners/{ownerId}/edit", method = RequestMethod.POST)
+    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId) {
+        if (result.hasErrors()) {
+            return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+        } else {
+            owner.setId(ownerId);
+            this.clinicService.saveOwner(owner);
+            return "redirect:/owners/{ownerId}";
+        }
+    }
+```
+
+要看懂这两个方法到底是干嘛用的，你可以看方法名称：`initUpdateOwnerForm()`和`processUpdateOwnerForm()`，你会发现这两个方法都映射到`"/owners/{ownerId}/edit"`这个URL上，前者绑定到是`GET`方法后者是`POST`方法。英文够好的话大概能猜出来前者提取某个Owner信息后放在一个页面上等待用户进行更新操作，后者用POST过来的数据更新某个Owner的信息。如何跟用户沟通这些接口的语意（语意指的是：接口是干什么用的，怎么调用，返回什么，会在什么情况下出现什么错误）呢？这里的用户可能包括测试人员（帮你用[Postman](https://www.getpostman.com/)等测试工具测试你的Controller方法）、页面开发人员（需要知道页面上的链接如何写，Form的Action如何写等）和一般用户（也许有些用户愿意直接访问URL）。这些用户可能看不到或看不懂你的代码，或者不愿意去看你的代码，那唯一的交流方法就是给他们写一个文档。
+
+你为什么会要写这个文档呢？因为你给的接口定义是你自己随意定的，写接口的人和用接口的人之间不存在共同认识，所以写出来的接口用的人看不懂，需要额外写文字说明。这个共同认识应该是什么呢？
+
+<!-- 设计不反映信息世界的本质。一个良好的接口设计，实际上是不需要文档说明的。人甚至机器可以根据接口本身正确产生对其的语意认识。 -->
+
+这个问题实际上在我们现在天天用的HTTP协议设计之初设计者就已经想好了。这个设计者就是[Roy Thomas Fielding](https://en.wikipedia.org/wiki/Roy_Fielding)博士。他是HTTP协议（1.0版和1.1版）的主要设计者、Apache服务器软件的作者之一、Apache基金会的第一任主席。Fielding博士在他2000年发表的博士论文《Architectural Styles and the Design of Network-based Software Architectures》中，提出了一个叫做REST的网络应用架构风格。REST这个词是Representational State Transfer的缩写，中文翻译叫做[表现层状态转换](https://zh.wikipedia.org/zh-hans/%E8%A1%A8%E7%8E%B0%E5%B1%82%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2)。简而言之，REST是一种设计原则，以便设计实现功能强、性能好、适宜通信的互联网应用系统。
+
+#### 资源
+
+撇开高深的理论不谈，REST架构中给出了互联网应用设计的一个核心思想。回想我们之前所说，我们开发一个信息系统，其目的就是希望能正确有效地管理信息。而互联网应用（或互联网信息系统），就是希望用户可以通过互联网来获得或管理信息。比如早期的静态网站，用户获得的就是一个HTML页面，以及其他相关的图片、视频等资源。对于我们现在看到的petclinic这个系统来说，我们希望用户获得或管理的信息是什么？是Owner、Pet、Vet等。这些信息跟一段视频、一张图片、一段文字本质上是一样的。所以实际上我们可以这么来看：互联网连接的是一个个资源，网络上的一个具体信息、任何事物，只要有被引用到的必要，它就是一个资源。例如：
+
+- 一段文本，一张图片，一首歌曲
+- 数据库中的一行数据
+- 一个手机号码，某用户的个人信息
+- 一种服务
+
+这些都是资源。要让一个资源可以被识别，需要有个唯一标识，在Web中这个唯一标识就是URI(Uniform Resource Identifier)。例如：
+
+- http://www.ex.com/software/releases/latest.tar.gz
+- http://www.ex.com/map/roads/USA/CA/17_mile_drive
+- http://www.ex.com/search/cs578
+- http://www.ex.com/sales/2012/Q1
+- http://www.ex.com/relationships/Alice;Bob
+
+为一个资源定义一个标识应该遵循一定的原则：
+
+- 应该易读，例如：`http://www.oschina.net/news/38119/oschina-translate-reward-plan`
+- 应该可以表达资源的层级关系，例如：`https://github.com/git/git/commit/e3af72cdafab5993d18fae056f87e1d675913d08/orders/2012/10`，可以用来表示2012年10月的订单记录
+- 应该可以表示资源的同级关系，例如：`http:/.../git/block-sha1/sha1.h/compare/e3af72cdafab5993d18fae056f87e1d675913d08; bd63e61bdf38e872d5215c07b264dcc16e4febca`
+- 应该可以表达资源的过滤，例如：`https://github.com/git/git/pulls?state=closed`，表示git项目中已经关闭的推入请求
+
+此外，不论什么样的资源，都是通过使用相同的接口进行资源的访问。接口应该使用标准的HTTP方法如GET，PUT和POST，并遵循这些方法的语义。
+
+- GET获：取表示，变更时获取表示（缓存）；
+- POST：使用服务端管理的（自动产生）的实例号创建资源，或创建子资源，部分更新资源，如果没有被修改，则不过更新资源（乐观锁）；
+- PUT：用客户端管理的实例号创建一个资源，通过替换的方式更新资源，如果未被修改，则更新资源（乐观锁）；
+- DELETE：删除资源。
+
+服务方给的响应也是标准的，例如用GET操作时，服务器返回值
+
+- 200（OK） - 表示已在响应中发出
+- 204（无内容） - 资源有空表示
+- 301（Moved Permanently） - 资源的URI已被更新
+- 303（See Other） - 其他（如，负载均衡）
+- 304（not modified）- 资源未更改（缓存）
+- 400 （bad request）- 指代坏请求（如，参数错误）
+- 404 （not found）- 资源不存在
+- 406 （not acceptable）- 服务端不支持所需表示
+- 500 （internal server error）- 通用错误响应
+- 503 （Service Unavailable）- 服务端当前无法处理请求
+
+其他POST、PUT、DELETE类似，此处不赘。
+
+每个资源用规范的URL进行命名，对资源的操作是标准化的四个操作，所有的获取、创建、修改、删除任何一个资源的方式都是规范的，这就叫做**统一接口原则**。
+
+因此回想一下，以前很多时候我们会设计出这样的URI来：
+
+- GET /getUser/1
+- POST /createUser
+- PUT /updateUser/1
+- DELETE /deleteUser/1
+
+这些URL的设计就是不合理的。按统一资源接口要求使用标准的HTTP方法对资源进行操作，URI只应该来表示资源的名称，而不应该包括资源的操作。 通俗来说，URI不应该使用动作来描述。
+
+#### 表现（Representation）／表述／表征
+
+上面说了，“资源”是一种信息实体，它可以有多种外在表现形式。我们把“资源”具体呈现出来的形式，叫做它的“表现层”（Representation）。例如文本可以用txt格式表现，也可以用HTML格式、XML格式、JSON格式表现，甚至可以采用二进制格式，图片可以用JPG格式表现，也可以用PNG格式表现。
+
+我们之前说的URI只代表资源的实体，不代表它的形式。严格地说，有些网址最后的“.html”后缀名是不必要的，因为这个后缀名表示格式，属于“表现层”范畴，而URI应该只代表“资源”的位置。资源的表述包括数据和描述数据的元数据，例如，HTTP头“Content-Type” 就是这样一个元数据属性。客户端可以通过Accept头请求一种特定格式的表述，服务端则通过Content-Type告诉客户端资源的表述形式。例如我们可以分别指定xml或json两种格式要求服务器返回同一个资源的不同表现形式：
+
+{% qnimg webtech/github-json.png %}
+
+{% qnimg webtech/github-xml.png %}
+
+服务器也可以拒绝返回某种不支持的表现形式：
+
+{% qnimg webtech/not-support.png %}
+
+#### 状态转移（State Transfer）
+
+我们在最初使用互联网时首先干的就是浏览网页。当你浏览Web网页时，从一个连接跳到一个页面，再从另一个连接跳到另外一个页面，就是利用了超媒体的概念: 把一个个把资源链接起来。
+
+对于更一般的资源而言，我们可以在表述格式里边加入链接来引导客户端，例如：
+
+{% qnimg webtech/link.png %}
+
+在`Link`头告诉客户端怎么访问下一页和最后一页的记录；在响应体里边，用url来链接项目所有者和项目地址。又例如，我们可以在创建订单后通过链接引导客户端如何去付款：
+
+{% qnimg webtech/link-payment.png %}
+
+这些链接带来了状态转移。
+
+首先明确一下状态这个概念。状态应该区分应用状态和资源状态，客户端负责维护应用状态，而服务端维护资源状态。客户端与服务端的交互必须是无状态的，并在每一次请求中包含处理该请求所需的一切信息。服务端不需要在请求间保留应用状态，只有在接受到实际请求的时候，服务端才会关注应用状态。这种无状态通信原则，使得服务端和中介能够理解独立的请求和响应。在多次请求中，同一客户端也不再需要依赖于同一服务器，方便实现高可扩展和高可用性的服务端。
+
+
+客户端应用状态在服务端提供的超媒体的指引下发生变迁。服务端通过超媒体告诉客户端当前状态有哪些后续状态可以进入。 
+ 
+#### 完整的故事
+
+看到这儿也许你有点晕，特别时状态转移这件事儿。我们来看一个完整的故事理解一下REST到底说了个什么。
+
+例如我订阅了一个人的博客，想要获取他发表的所有文章（这里“他发表的所有文章”就是一个资源Resource）。于是我就向他的服务发出请求，说“我要获取你发表的所有文章，最好是atom格式的”，这时候服务器向你返回了atom格式的文章列表第一页（这里“atom格式的文章列表”就是表征Representation）。然后？
+
+{% qnimg webtech/story.png %}
+
+
+- 你看到了第一页的页尾，想要看第二页，这时候有趣的事情就来了。如果服务器记录了应用的状态（stateful），那么你只要向服务询问“我要看下一页”，那么服务器自然就会返回第二页。类似的，如果你当前在第二页，想服务器请求“我要看下一页”，那就会得到第三页。
+- 但是REST的服务器恰恰是无状态的（stateless），服务器并没有保持你当前处于第几页，也就无法响应“下一页”这种具有状态性质的请求。因此客户端需要去维护当前应用的状态（application state），也就是“如何获取下一页资源”。
+- 当然，“下一页资源”的业务逻辑必然是由服务端来提供。服务器在文章列表的atom表征中加入一个URI超链接（hyper link），指向下一页文章列表对应的资源。客户端就可以使用统一接口（Uniform Interface）的方式，从这个URI中获取到他想要的下一页文章列表资源。
+- 上面的“能够进入下一页”就是应用的状态（State）。服务器把“能够进入下一页”这个状态以atom表征形式传输（Transfer）给客户端就是表征状态传输（REpresentational State Transfer）这个概念。
+
+也就是说：服务器生成包含状态转移的表征数据，用来响应客户端对于一个资源的请求；客户端借助这份表征数据，记录了当前的应用状态以及对应可转移状态的方式。
+
+仔细琢磨琢磨，按这个思路去设计系统，是不是不需要写接口文档了？一个没看过你的文档的人甚至机器都能将你提供的资源完全获取得到。
 
 # 前端技术
 
