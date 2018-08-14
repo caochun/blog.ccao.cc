@@ -61,13 +61,13 @@ use CGI qw/:standard/;
   print $cgi->header,  
   $cgi->start_html('A Simple Example'),  
   $cgi->h1('A Simple Example');  
-   
+
   if ( $cgi->param())  
   {  
     print "Your name is ",  
     $cgi->param('name');  
   }  
-   
+
   $cgi->end_html();  
 }  
 ```
@@ -110,7 +110,7 @@ import javax.servlet.http.*;
 
 // Extend HttpServlet class
 public class HelloWorld extends HttpServlet {
- 
+
    private String message;
 
    public void init() throws ServletException {
@@ -120,7 +120,7 @@ public class HelloWorld extends HttpServlet {
 
    public void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-      
+
       // Set response content type
       response.setContentType("text/html");
 
@@ -142,7 +142,7 @@ public class HelloWorld extends HttpServlet {
 
 ## MVC Web
 
-细心的你会发现，其实Java Servlet和早起的CGI技术原理上是一样的：用户发送一个HTTP请求到服务器，服务器端执行一段代码，代码产生结果，渲染为HTML结构的页面返回给用户。但为什么现在你主要用的时Servlet技术开发Web应用而不是CGI呢？因为现在我们在Servlet之上构造了一层MVC的设计模式。
+细心的你会发现，其实Java Servlet和早期的CGI技术原理上是一样的：用户发送一个HTTP请求到服务器，服务器端执行一段代码，代码产生结果，渲染为HTML结构的页面返回给用户。但为什么现在你主要用的时Servlet技术开发Web应用而不是CGI呢？因为现在我们在Servlet之上构造了一层MVC的设计模式。
 
 
 之前那段Servlet代码中的`doGet()`函数是执行主体。
@@ -150,7 +150,7 @@ public class HelloWorld extends HttpServlet {
 ``` java
 public void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-      
+
       // Set response content type
       response.setContentType("text/html");
 
@@ -194,7 +194,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response)
 
 ``` java
 
-protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
     request.setAttribute("time", new Date()); // 'time' would be  shown on JSP page             
     RequestDispatcher view = request.getRequestDispatcher("WEB-INF/templates/sample.jsp");      
@@ -708,8 +708,8 @@ http://localhost:9966/petclinic/swagger-ui.html
 首先明确一下状态这个概念。状态应该区分应用状态和资源状态，客户端负责维护应用状态，而服务端维护资源状态。客户端与服务端的交互必须是无状态的，并在每一次请求中包含处理该请求所需的一切信息。服务端不需要在请求间保留应用状态，只有在接受到实际请求的时候，服务端才会关注应用状态。这种无状态通信原则，使得服务端和中介能够理解独立的请求和响应。在多次请求中，同一客户端也不再需要依赖于同一服务器，方便实现高可扩展和高可用性的服务端。
 
 
-客户端应用状态在服务端提供的超媒体的指引下发生变迁。服务端通过超媒体告诉客户端当前状态有哪些后续状态可以进入。 
- 
+客户端应用状态在服务端提供的超媒体的指引下发生变迁。服务端通过超媒体告诉客户端当前状态有哪些后续状态可以进入。
+
 #### 完整的故事
 
 看到这儿也许你有点晕，特别时状态转移这件事儿。我们来看一个完整的故事理解一下REST到底说了个什么。
