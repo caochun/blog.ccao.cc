@@ -732,6 +732,13 @@ http://localhost:9966/petclinic/swagger-ui.html
 
 ## 发展历程
 
+### jQuery
+
+jQuery 创立之初的主要目标是，简化HTML与JavaScript之间的操作，开发者可以轻松地使用 `$('elment').doSomething()` 的形式来对元素进行操作。
+
+
+
+
 ### 早期
 
 
