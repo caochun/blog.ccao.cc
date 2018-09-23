@@ -290,9 +290,9 @@ query = session.query(User)
 
 图20.12展示了在*连接急切加载*(joined eager loading)场景中，几个''LoaderStrategy''对象的遍历过程，说明了它们在''Query''的''_compile_context''方法中连接到一个渲染过的SQL语句。图中还展示了在''Query''的''instansces''方法中生成*行填充*(row population)函数的过程，接收结果行，并填充一个对象的属性。
 
-![](https://raw.githubusercontent.com/nettee/SQLAlchemy-survey/master/picture/query-loading.png| Figure 20.12}}
+![图20.12：连接急切加载中loader strategy的遍历](https://raw.githubusercontent.com/nettee/SQLAlchemy-survey/master/picture/query-loading.png)
 
-图20.12：连接急切加载中loader strategy的遍历
+
 
 SQLAlchemy早期填充结果的方法使用了一个传统的遍历，将固定的对象方法和每个接受行的策略联系起来并对应工作。在0.5版本中第一次引入的可调用加载系统，极大地提升了性能。因为很多和行处理有关的决定只要在最开始做一次，而不是对每行都做一个决定，很多没有作用的函数调用就被消除了。
 
@@ -324,13 +324,13 @@ SQLAlchemy早期填充结果的方法使用了一个传统的遍历，将固定�
 
 
 
-面向外部的部分是''Session''和用户定义的对象的集合，每个用户定义的对象都是一个映射类的实例。这里我们看到，映射的对象保存了一个到''InstanceState''的引用，这个对象记录了ORM的状态，包括即将发生的属性改变和属性消除状态。前面“映射剖析”章节讨论的属性instrumentation，''InstanceState''是在其中的实例级部分——与在类级的''ClassManager''相对应（前面讲过，映射类及其实例之间是对称的，行为有某种对应关系——译者注）。它代表和类关联的''AttributeImpl''对象，维护映射对象的字典的状态（即Python的''__dict__''属性）。
+面向外部的部分是''Session''和用户定义的对象的集合，每个用户定义的对象都是一个映射类的实例。这里我们看到，映射的对象保存了一个到''InstanceState''的引用，这个对象记录了ORM的状态，包括即将发生的属性改变和属性消除状态。前面“映射剖析”章节讨论的属性instrumentation，''InstanceState''是在其中的实例级部分——与在类级的''ClassManager''相对应（前面讲过，映射类及其实例之间是对称的，行为有某种对应关系——译者注）。它代表和类关联的''AttributeImpl''对象，维护映射对象的字典的状态（即Python的''\_\_dict\_\_''属性）。
 
 #### 状态跟踪 ####
 
 ''IdentityMap''是一个从数据库ID到''InstanceState''对象的映射，是为叫做*persistent*的有数据库ID的对象工作的。''IdentityMap''的默认实现和''InstanceState''一起工作来管理自己的大小，方式是在指向一个实例的所有强引用都删除后，把这个实例也删除——这和Python的''WeakValueDictionary''的工作方式是一样的。''Session''对所有标记为*dirty*或*deleted*的对象，以及标记为*new*的pending对象，通过创建到这些对象的强引用来保护这些对象免于垃圾回收。所有的强引用都会在刷新后被丢弃。
 
-''InstanceState''还在维护特定对象的属性“变了啥”中扮演着重要的角色。它使用一个“改变时移动”的系统，将特定属性“从前的”值，在将到来的值赋值到对象当前的字典之前，在存储到一个叫''committed_state''的字典中。在刷新时，''committed_state''和对象关联的''__dict__''的内容会进行比较，产生每个对象的净改变。
+''InstanceState''还在维护特定对象的属性“变了啥”中扮演着重要的角色。它使用一个“改变时移动”的系统，将特定属性“从前的”值，在将到来的值赋值到对象当前的字典之前，在存储到一个叫''committed_state''的字典中。在刷新时，''committed_state''和对象关联的''\_\_dict\_\_''的内容会进行比较，产生每个对象的净改变。
 
 对于集合的情况，一个单独的''collections''包和''InstrumentedAttribute''/''InstanceState''系统合作，为一个特定映射对象的集合维护一个净改变的集合。常见的Python类如''set''，''list''，''dict''都在使用前进行继承并根据历史跟踪的增变方法进行扩展。集合系统在0.4版本修订为可扩充的，可以在任何类似集合的对象上使用。
 
