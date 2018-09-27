@@ -751,7 +751,7 @@ Ant Design是一个UI 设计语言，是一套提炼和应用于企业级后台�
 由于Ant Design提供了大量的Demo，并且有详实易读的官方的中文说明文档与教程，有需要的读者可以自行访问[这里][22]
 
 
-  [1]: https://github.com/Benjamin15122/dc-ui
+  [1]: https://github.com/Benjamin15122/react-redux-example
   [2]: http://javascript.ruanyifeng.com/nodejs/packagejson.html#toc2
   [3]: https://reactjs.org/docs/getting-started.html
   [4]: https://segmentfault.com/a/1190000010522782
