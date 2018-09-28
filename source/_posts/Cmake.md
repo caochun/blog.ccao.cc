@@ -1,3 +1,9 @@
+---
+title: Cmake
+date: 2018-09-28
+tags: aosabook
+---
+
 # 背景介绍 #
 
 1999年，国家医学图书馆雇用了一个叫Kitware的小公司来开发一个能更好配置，构建和发布复杂跨平台软件的方法。这项工作是ITK(the Insight Segmentation and Registration Toolkit，一种软件)项目的一部分。作为这个项目的工程领导，Kitware负责开发一个可供ITK项目的研究人员和开发人员使用的软件构建体系。这个系统必须使用简单，并且尽量不占用开发员推进主项目的时间。基于上述指导思想，CMake作为过去的软件构建工具autoconf/libtool的替代品，它应该扬其长避其短。 经过多年的发展，CMake从最初的软件构建体系发展成为了一系列的开发工具：CMake, CTest, CPack和CDash。CMake是软件构建工具，CTest是一个测试驱动工具，用来做回归测试。CPack是打包工具，它能为用CMake构建的软件创造各个平台的安装包。CDash是一个网页应用，能够持续执行集成测试并且展示测试结果。
@@ -82,7 +88,7 @@ CMake有两个阶段。第一个是配置，在这个阶段CMake会将其获得�
 一旦配置阶段完成，生成阶段就开始了。生成阶段将用户指定类型的构建文件。此时目标的内部表达（库，可执行文件，定制目标）转化为本地工具的构建工具比如：Visual Studio和Makefiles文件。Cmake在配置阶段之后生成的内部表达，要尽可能的普遍跟通用，这样才会有更多的代码和数据结构能够被不同的构建工具所共享。
 
 CMake处理过程简图如5.1
-![](/images/42.png)
+![](/cdn/images/aosabook/42.png)
 
 ## 5.2.2 CMake的代码 ## 
 
@@ -90,7 +96,7 @@ CMake中的对象
   
 CMake是一种使用了继承，封装等面向对象技术。它的主要对象和它们之间的关系如下图：
   
-![](/images/43.png)
+![](/cdn/images/aosabook/43.png)
   
 每个CMakeLists.txt的解析结果存储在一个cmMakefile里面。除了这个目录的信息，cmMakefile对象也控制着对CMakeLists.txt的解析。解析函数会调用基于lex/yacc的分析器。由于CMake的语法很少发生变化，而且lex和yacc有可能并不在CMake建立的地方，所以将lex和yacc的输出结果被处理和保存到了Source目录中，和其他的文件一起加入到版本控制系统中。
   
@@ -138,11 +144,11 @@ cpack可执行程序用来生成项目的安装程序。CPack的执行和CMake�
 
 通常用户们对于CMake的第一印象就是CMake的用户界面。CMake有两个用户交互程序：基于Qt的窗口型图形界面程序和基于命令行的图形界面应用。这些GUI都是CMakeCache.txt文件的可视化编辑器。它们都各自通过两个按钮进行交互，配置和生成——对应于两个主要的阶段。命令行的图形及面用于Unix的TTY类型的平台和Cygwin。而Qt的图形界面对于所有的平台都适用。下面图5.3和5.4展示了两种图形界面
 
-![](/images/44.png)
+![](/cdn/images/aosabook/44.png)
 
 图5.3
   
-![](/images/45.png)
+![](/cdn/images/aosabook/45.png)
 
 图5.4
   

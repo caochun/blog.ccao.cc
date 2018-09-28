@@ -1,3 +1,9 @@
+---
+title: SocialCalc
+date: 2018-09-28
+tags: aosabook
+---
+
 # SocialCalc #
 
 电子表格的历史有超过30年了。第一个电子表格VisiCalc是Dan Bricklin在1978年构思的，并在1979年传播开来。最初的理念是很直接的：一个文本、数字和公式构成的二维表格。公式由普通数学操作符和各种各样函数构成的，并且每个公式可以当做值使用其它当前内容的单元格。
@@ -29,25 +35,25 @@ WikiCalc的第一个版本（图19.1）有许多和其它电子表格区分开�
 ·存储格能使用 CSS 来改变样式。 
 ·记录所有编辑操作，以供稽核纪录。 
 ·和Wiki系统一样，保留每一个版本，并可以随时回复 
-![图19.1](/images/8.png)
+![图19.1](/cdn/images/aosabook/8.png)
                                              
-![图19.2](/images/9.png)
+![图19.2](/cdn/images/aosabook/9.png)
                                              
-![图19.3](/images/10.png)
+![图19.3](/cdn/images/aosabook/10.png)
                                              
 WikiCalc 1.0的内部架构（图19.2）和信息流（图19.3）是简单的，但是很强大。从几个小型电子表格组建一个主电子表格的能力，是 WikiCalc 的一大强项。举例来说，每位销售员可以把营业额放在自己的电子表格页面里；然后销售经理可以综合这些资料到该区的电子表格中，之后销售副总再综合各区域的数字，构成主电子表格。 每次电子表格之一被更新了，所有的相关电子表格都能反应这个更新。如果有人想看到更详细的信息，他们只要点击去查看这个电子表格后面的电子表格就好了。这种能力减少了更新数字可能出现的多余或者出错的努力，并且确保了所有信息的视图保持最新状态。
 为了保证计算数据是最新的，WikiCalc采取了一种"瘦"客户端的设计，保持所有的状态信息在服务器端。每个电子表格在浏览器都用table代表；编辑一个单元格会发送一个ajaxsetcell调用给服务器，并且服务器会告诉浏览器哪个单元格需要更新。 
 不足为奇，这个设计取决于浏览器和服务器间的快速联系。当潜伏因素多的时候，用户将开始注意到"Loading..."消息的频繁出现，就像表格19.4展示的那样。这个对于用户交互地编辑并期待实时看到结果是一个问题。 
-![图19.4](/images/11.png)
+![图19.4](/cdn/images/aosabook/11.png)
                                              
 此外，因为table元素和电子表格有相同的维度，一个100*100的网格将创造10000DOM项目，这拉长了浏览器的记忆资源，限制了网页大小。 因为这些缺点，虽然WikiCalc作为在本地主机运行的独立服务器是方便使用的，但是当做网页内容管理系统的一部分是不切实际的。 在2006年，Dan Bricklin和Socialtext一起组队开始发展SocialCalc，一个用js并基于一些Perl源代码的WikiCalc的重写。 这次重写目的在于大的分布式的合作，并且寻求展示一个视图并更像一个桌面应用。其它设计目标包括： ·能够处理成千的单元格 ·编辑操作具有快速的转向时间 ·客户端审计追踪和撤销/恢复栈 ·更好地使用js和CSS以提供展示功能 ·支持不同版本的浏览器，尽管相应的js需要更大代价 经过三年的开发和发布许多次测试版之后，Socialtext 在 2009 年发布 SocialCalc 1.0，成功实现了设计目标。现在，让我们来看看 SocialCalc 的系统架构。
 
 ## 19.2 SocialCalc ##
 
-![图19.5](/images/12.png)
+![图19.5](/cdn/images/aosabook/12.png)
                                              
 图19.5和图19.6分别展示了SocialCalc的界面和类图。相比于WikiCalc，服务器的角色被大大减弱了。它的唯一职责是对HTTP GET进行相应，反馈保存格式的整个表单；一旦浏览器收到数据，所有的计算、变动轨迹和用户交流都在JavaScript中实现。
-![图19.6](/images/13.png)
+![图19.6](/cdn/images/aosabook/13.png)
                                             
 Javascript部分是按照MVC风格来设计的，每个类关注一个方面：
 
@@ -105,7 +111,7 @@ Javascript部分是按照MVC风格来设计的，每个类关注一个方面：
 
 为了提高响应程度，SocialCalc在背景执行所有的重新计算和DOM更新，所以当引擎在命令队列中处理前面的变动时，用户可以保持对一些单元格进行修改。
 
-![图19.7](/images/14.png)
+![图19.7](/cdn/images/aosabook/14.png)
                                              
         
 当命令正在运行时，TableEditor对象把busy的标志置为true，随后的命令放到defferredCommands队列中，确保一次序列顺序的执行。事件循环图显示在图19.7中，表格对象不停地发送StatusCallback事件，以通知当前命令执行状态的用户，经历下面这四个步骤：
@@ -126,7 +132,7 @@ ExecuteSheetCommand对每个执行过的命令创建了撤销命令。举个例�
 
 现在让我们看看TableEditor层次。它计算了屏幕上RenderContext坐标，并且通过两个TableControl管理水平/垂直滚动条。
 
-![图19.8](/images/15.png)
+![图19.8](/cdn/images/aosabook/15.png)
                                      
                                        
 在视图层次，由RenderContext类处理，并且与WikiCalc设计不同。我们不是把每个单元格映射到&lt;td>元素，而是简单地创建一个固定大小的&lt;table>来适应浏览器的可视范围，并且用&lt;td>元素预先构建。
@@ -137,11 +143,11 @@ ExecuteSheetCommand对每个执行过的命令创建了撤销命令。举个例�
 
 TableEditor也包括一个CellHandles对象，这个实现了当前编辑单元格的右下角的填充/移动/滑动菜单，即ECell，如图19.9所示。
 
-![图19.9](/images/16.png)
+![图19.9](/cdn/images/aosabook/16.png)
 
 输入框由两个类管理：InputBox和InputEcho。前者管理网格上的编辑行，后者展示及时更新的预览层，覆盖ECell的内容（图19.10）。
 
-![图19.10](/images/17.png)
+![图19.10](/cdn/images/aosabook/17.png)
                                                                           
 通常，SocialCalc引擎当打开一个表单进行编辑时和将它存回服务器时，仅需要与服务器通信。出于这个目的，Sheet.ParseSheetSave方法将一个保存格式的字符串转成一个Sheet对象，Sheet.CreateSheetSave方法将Sheet对象转成存储格式。
 
@@ -155,7 +161,7 @@ TableEditor也包括一个CellHandles对象，这个实现了当前编辑单元�
 * 可选择的edit部分保存TableEditor的编辑状态，包括ECell上一个位置，列/行的固定大小。
 * 可选择的audit部分包括了在之前编辑的历史运行命令。
 举个例子，图19.11显示了一个有三个单元格的表格，1874位于A1并且是ECell，A2中是式子2^2*43，A3中以粗体形式显示了计算式SUM(Foo)，表示从A1到A2的Foo范围。
-![图19.11](/images/18.png)
+![图19.11](/cdn/images/aosabook/18.png)
                                                                       
 表格序列化的存储形式就像这样：
 ```
@@ -202,7 +208,7 @@ TableEditor也包括一个CellHandles对象，这个实现了当前编辑单元�
 ## 19.6 Rich-text Editing ##
 
 第一个例子是用wiki笔记提升SocialCalc的文本单元格，在表格编辑器中展示它丰富的文本。
-![图19.12](/images/19.png)
+![图19.12](/cdn/images/aosabook/19.png)
                                          
 在SocialCalc 1.0之后的版本中添加了这个特征，用统一的语法解决了插入图片、链接、文本标记的广泛要求。既然Socialtext已经有一个开源的wiki平台，自然地重复使用了SocialCalc的语法。
 为了完成这个，我们需要给text-wiki的textvalueformat提供特定的格式，用它改变文本单元格的默认形式。
@@ -213,7 +219,7 @@ TableEditor也包括一个CellHandles对象，这个实现了当前编辑单元�
 在SocialCalc中，每个单元格都有一个datatype和一个valuetype. 包含文本或者数字的数据单元格对应文本型/数字型的值类型，并且公式单元格有datatype = "f"大概产生数字型或者文本型的值。
 回忆绘制步骤，Sheet对象从每个单元格产生HTML。它通过考察每个单元格的valuetype:如果以t开头，那么单元格的textvalueformat属性决定了如何产生；如果以n开头，那么nontextvalueformat属性被使用。
 但是，如果单元格的textvalueformat或者nontextvalueformat属性没有准确定义，那么默认的形式可从它的valuetype中查找，如图19.13所示。
-![图19.13](/images/20.png)
+![图19.13](/cdn/images/aosabook/20.png)
                                                                          
 对text-wiki值格式的支持在SocialCalc.format_text_for_display中：
 ```
@@ -246,13 +252,13 @@ spreadsheet.InitializeSpreadsheetControl("tableeditor", 0, 0, 0);
 spreadsheet.ExecuteCommand('set sheet defaulttextvalueformat text-wiki');
 ```
 合起来，绘制步骤如图19.14工作。
-![图19.14](/images/21.png)  
+![图19.14](/cdn/images/aosabook/21.png)  
                                                                                
 就这样，提高后的SocialCalc现在支持一系列丰富的wiki标注语法：
-![](/images/22.png)
+![](/cdn/images/aosabook/22.png)
 
 试着在A1单元格键入*bold* _italic_ `monospace`，你将看到绘制的丰富的文本显示（图19.15）。   
-![图19.15](/images/23.png)
+![图19.15](/cdn/images/aosabook/23.png)
                                                                                         
 
 
@@ -273,14 +279,14 @@ SocialCalc.ScheduleSheetCommands = function(sheet, cmdstr, saveundo, isRemote) {
 
 现在我们需要做的就是定义一个合适的SocialCalc.Callbacks.broadcast回调函数。一旦它在适当的地方，相同的命令将在连接到同一个表单的所有的用户端执行。
 当这个特征在2009年在OLPC(One Laptop Per Child(注释2))上由SEETA's Sugar Labs实现，broadcast函数建立在XPCOM 上，用D-Bus/Telepathy，一种OLPC/Sugar网络的标准传播（见图19.16）。     
-![图19.16](/images/24.png)   
+![图19.16](/cdn/images/aosabook/24.png)   
                                                                                                                                           
 工作起来很合理，使得XO实例在同一个Sugar网络上可以在一个普通的SocialCalc表单上合作。但是，这对Mozilla/XPCOM浏览器平台和D-Bus/Telepathy信息平台都是特定的。
 ### 19.7.1 Cross-browser Transport ###
                              
 为了实现跨浏览器和跨操作系统，我们使用Web::Hippie的框架，一个高等级的使用方便JQuery捆绑的JSON-over-WebSocket的抽象，当WebSocket不空闲时使用MXHR（Multipart XML HTTP Request(注释5)）作为稍后的传输机制。
 对于有Adobe Flash插件但是没有原生WebSocket支持的浏览器，我们使用web_socket.js项目的WebSocket的Flash模拟器，这一班比MXHR更快更可靠。这个操作流显示在图19.17中。
-![图19.17](/images/25.png)
+![图19.17](/cdn/images/aosabook/25.png)
                                                                
 在客户端SocialCalc.Callbacks.broadcast函数如下定义：
 ```
@@ -303,11 +309,11 @@ $(hpipe).bind("message.execute", function (e, d) {
 ### 19.7.2. Conflict Resolution ###
 
 第一个问题是命令执行顺序的竞争条件：如果用户A和用户B同时执行了影响相同单元格的操作，接受和执行其他用户传播的命令，他们最终将处于不同的状态，如图19.18.
-![图19.18](/images/26.png)
+![图19.18](/cdn/images/aosabook/26.png)
                                                                
                                                                
 我们可以使用SocialCalc内置的undo/redo机制来处理这个问题，如图19.19显示。
-![图19.19](/images/27.png)                                                               
+![图19.19](/cdn/images/aosabook/27.png)                                                               
                                                                
                                                                
 这个处理冲突的过程如下。当客户传播一个指令时，它向队列添加这个指令。当客户接收到一个指令时， 检查远程指令和队列。
@@ -340,7 +346,7 @@ $(hpipe).bind("message.ecell", function (e, d) {
 box-shadow: inset 0 0 0 4px red, inset 0 0 0 2px green;
 ```
 图19.20显示了如果四个人在同一个表单上编辑时的显示：
-![图19.20](/images/28.png)                       
+![图19.20](/cdn/images/aosabook/28.png)                       
                                                                
                                                                
 ## 19.8 Lesson Learned ##

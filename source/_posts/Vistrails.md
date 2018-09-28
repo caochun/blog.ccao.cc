@@ -1,3 +1,9 @@
+---
+title: Vistrails
+date: 2018-09-28
+tags: aosabook
+---
+
 # VisTrails #
 
 Juliana Freire, David Koop, Emanuele Santos, Carlos Scheidegger, Claudio Silva, and Huy T. Vo
@@ -17,7 +23,7 @@ VisTrail的扩展性来自一个基础设施, 使得用户在整合工具和库�
 
 为了保持系统开源和免费, 我们建立了仅供VisTrail的免费，开源包.VisTrail被用Python编写并使用Qt来作为他的GUI工具包(通过PyQt Python绑定). 因为有着广泛的用户和应用, 我们在脑海里已经将系统设计成具有高移植性. VisTrail能在Windows, Mac和Linux上运行
 
-![](/images/58.png)
+![](/cdn/images/aosabook/58.png)
 
 Figure 23.1：VisTrail用户界面的组成
 
@@ -44,7 +50,7 @@ Figure 23.1：VisTrail用户界面的组成
 
 事实上，工作流系统的广泛应用的一种催化剂已经变得更容易地自动捕获起源了. 尽管早期的工作流系统已经被拓展到用来捕获起源, 但VisTrail已经被设计成支持起源了.
 
-![](/images/59.png)
+![](/cdn/images/aosabook/59.png)
 
 Figure 23.2: 加强注释的起源探索
 
@@ -59,7 +65,7 @@ Figure 23.2: 加强注释的起源探索
 
 版本树视图帮助用户在不同工作流版本中导航. 如 Figure 23.2所示, 点击版本树上的一个节点, 用户可以看到一个工作流, 它与结果(视觉向预览)和元数据有关. 一些元数据是自动捕获的, 例如, 创建了特别的工作流用户的和日程创建的ID. 但是用户也可以提供额外的元数据, 包括一个识别工作流的标签以及一个写好的描绘.
 
-![](/images/60.png)
+![](/cdn/images/aosabook/60.png)
 [Figure 23.3: VisTrail架构]
 
 
@@ -84,7 +90,7 @@ VisTrail系统的一个测试版是在2007年1月首次发布, 从那时以来, 
 
 ### 23.3.1 版本树：基于变化的起源 ###
 
-![](/images/61.png)
+![](/cdn/images/aosabook/61.png)
 
 [Figure 23.4 基于变化的起源模型]
 
@@ -168,7 +174,7 @@ VisTrail模块的一个奇特的特性以及他们之间的交流在于数据在
 
 这一决定带来的第二个好处是定义工作流中的常数值和用户可设置参数变得更加容易, 并且能与系统的其他部分更加均匀的集成在一起. 例如会有一个工作流从一个常量指定的Web指定的位置载入文件这样的情况. 目前这是可以使用能够指定URL作为参数的GUI来指定的(见图23.1 参数编辑区域). 这个工作流的一个自然的修改是去使用它来获取在上游某处被计算出的URL. 我们想要剩下的工作流尽可能的少改变. 通过假设模块能够输出他们自己, 我们能够简单地将一个字符串链接和与参数相符的端口右值链接起来. 因为常量的输出估计了它自己, 如果该值已经实际指定为一个常数, 那么它的行为是完全一样的.
 
-![](/images/62.png)
+![](/cdn/images/aosabook/62.png)
 
 [Figure 23.5  ''PythonSource'' 模块的新功能原型制造]
 
@@ -182,7 +188,7 @@ VisTrail模块的一个奇特的特性以及他们之间的交流在于数据在
 
 如上所述, VisTrail提供了一组功能和用户接口来简化创建和执行探索计算任务.下面我们介绍其中的一些. 我们也要简单探讨VisTrail是如何被作为一个支持创建起源丰富出版架构的基础的. 关于VisTrail以及它的特性更全面的表述请参阅VisTrail在线文档[6].
 
-![](/images/63.png)
+![](/cdn/images/aosabook/63.png)
 
 [Figure 23.6 可视化电子表格]
 

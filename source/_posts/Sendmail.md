@@ -1,3 +1,9 @@
+---
+title: Sendmail
+date: 2018-09-28
+tags: aosabook
+---
+
 此章节的 http://www.aosabook.org/en/sendmail.html|英文原文 在 http://www.ituring.com.cn/minibook/19|图灵社区 中没有中文翻译，所以会先行翻译，再发布调研报告。
 
 # Sendmail 中文翻译 #

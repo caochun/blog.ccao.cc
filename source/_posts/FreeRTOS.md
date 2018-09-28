@@ -1,3 +1,9 @@
+---
+title: FreeRTOS
+date: 2018-09-28
+tags: aosabook
+---
+
 # FreeRTOS #
 FreeRTOS(读作"free-arr-toss")是一个嵌入式系统使用的开源实时操作系统(RTOS)。FreeRTOS能支持许多不同硬件架构以及交叉编译器,被设计为“小巧，简单，和易用”。
 
@@ -32,7 +38,7 @@ FreeRTOS的代码可以分解为三个主要区块：任务，通讯，和硬件
 
 硬件无关的FreeRTOS层在硬件相关层之上。硬件相关层声明了你选择什么样的芯片架构。图3.1显示了FreeRTOS的各层。
 
-![](/images/74.png)
+![](/cdn/images/aosabook/74.png)
 
 图3.1：FreeRTOS的软件层
 
@@ -98,7 +104,7 @@ FreeRTOS系统的心跳就是被称为系统节拍器（时钟）。FreeRTOS配�
 
 图3.2是一个大致的就绪列表看起来像什么的图。这个例子有三个优先级，有一个优先级为0的任务，没有优先级为1的任务，和三个优先级为2的任务。这张图是准确的，但不完整的；它的少掉一些细节，我们稍后将补充。
 
-![](/images/75.png)
+![](/cdn/images/aosabook/75.png)
 
 图3.2：FreeRTOS的就绪列表的基本视图
 
@@ -180,7 +186,7 @@ TCB在''uxPriority''和''uxBasePriority''中存储任务的初始优先级。一
 ## 3.5.列表 ##
 任务之后，最常用的FreeRTOS数据结构是列表。FreeRTOS使用列表结构来跟踪调度任务，并执行队列。
 
-![](/images/77.png)
+![](/cdn/images/aosabook/77.png)
 图3.3：就绪列表全貌
 
 这个FreeRTOS的列表是一个有着几个有趣的补充的标准循环双链表。下面就是列表元素：
@@ -228,7 +234,7 @@ TCB在''uxPriority''和''uxBasePriority''中存储任务的初始优先级。一
 ``` 
 FreeRTOS经常需要通过多个for()和while()循环，也包括函数调用来访问列表，因此它使用操纵''pxIndex''指针的列表函数来遍历这个列表。这个列表函数''listGET_OWNER_OF_NEXT_ENTRY()''执行''pxIndex = pxIndex->pxNext;''并且返回''pxIndex''。（当然它也会正确检测列尾环绕。）这种，当执行遍历的时候使用''pxIndex''，由列表自己负责跟踪“在哪里”的方法，使FreeRTOS可以休息而不用关心这方面的事。
 
-![](/images/76.png)
+![](/cdn/images/aosabook/76.png)
 
 图3.4：系统节拍计时器下的FreeRTOS就绪列表全貌
 

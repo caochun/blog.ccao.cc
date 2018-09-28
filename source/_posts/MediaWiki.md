@@ -1,3 +1,9 @@
+---
+title: MediaWiki
+date: 2018-09-28
+tags: aosabook
+---
+
 # MediaWiki #
 从一开始，MediaWiki就是专门为维基百科服务的软件。开发者一直致力于使其能更方便的被第三方用户使用，但在其发展过程中，是维基百科的影响力和偏好塑造了MediaWiki的体系结构。
 
@@ -68,7 +74,7 @@ MediaWiki以前过分依赖于全局变量，包括配置和上下文处理。�
 ## 12.3 数据库和文本储存 ##
 从二期软件开始，MediaWiki就开始使用关系数据库作为后台。MediaWiki默认的(支持性最好的)数据库管理系统是MySQL，MySQL同时也被所有维基媒体基金会的网站使用，也有其他的数据库管理系统(比如PostgreSQL、Oracle和SQLite)由社区支持来实现。系统管理员可以在安装MediaWiki时选择一个数据库，并且MediaWiki提供了一个数据库的抽象和一个查询的抽象层来为开发者简化数据库接口。
 
-![](/images/64.png)
+![](/cdn/images/aosabook/64.png)
 
 Figure 12.1: 数据库设计
 
@@ -76,7 +82,7 @@ Figure 12.1: 数据库设计
 
 这些年，数据库的模式有了许多的变换，其中最著名的则是MediaWiki1.5版里的文本存储的解耦和修订追踪。
 
-![](/images/65.png)
+![](/cdn/images/aosabook/65.png)
 
 Figure 12.2: Main content tables in MediaWiki 1.4 and 1.5
 

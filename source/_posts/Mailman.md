@@ -1,3 +1,9 @@
+---
+title: Mailman
+date: 2018-09-28
+tags: aosabook
+---
+
 # GNU Mailman 翻译 #
 
 ### Barry Warsaw ###
@@ -9,7 +15,7 @@
 == 原文地址 http://aosabook.org/en/mailman.html ==
 
 
-![](http://aosabook.org/images/cover2.jpg)
+![](http://aosabook.org/cdn/images/aosabook/cover2.jpg)
 
 http://www.list.org/ GNU Mailman 是一款管理邮件列表的免费软件。几乎所有书写或使用免费和开源软件的人都会遇到一个邮件列表。邮件列表可以以讨论为基础或以公告为基础，在这两者间有着各种类型的变化。有时邮件列表在Usenet的新闻组上是相互连通的，或者有类似的服务如 http://gmane.org/|Gmane 。邮件列表通常包含一些档案，这些档案涵盖了已发布到邮件列表的所有信息的历史记录。
 
@@ -27,7 +33,7 @@ Ken Manheimer在许多早期的Mailman工作中提供了许多帮助，并且许
 
 Mailman中一个核心数据结构便是邮件报文（email message），表现为一个报文对象（message object）。系统中的许多接口、函数和方法，有三个参数：邮件列表对象、报文对象和当系统中的报文被加工时用于记录和传达状态的元数据字典。
 
-![Figure 10.1: A MIME ''multipart/mixed'' message containing text, images, and an audio file](http://aosabook.org/images/mailman/mime.png)
+![Figure 10.1: A MIME ''multipart/mixed'' message containing text, images, and an audio file](http://aosabook.org/cdn/images/aosabook/mailman/mime.png)
 
 在它的表面，邮件报文是一个简单的对象。它由许多的被称为表头的由冒号分隔的键-值对组成，后面跟一个空行，将表头从报文中分离出来。这种结构的表示方法应是很容易被语法分析、生成、推理、操纵的，但事实上它很快就变得非常复杂。有无数的RFC来描述所有可能发生的变化，例如处理复杂的数据类型，如图像，音频等等。电子邮件可以包含ASCII英文，或是任何存在的语言和字符集。一封电子邮件报文的基本结构已经被其他协议一遍又一遍借鉴，如NNTP和HTTP，但每个稍有不同。我们对于Mailman 的工作已经演化成几个库来处理这种格式的变化（通常被称为“RFC822”，建立于1982年[[http://www.faqs.org/rfcs/rfc822.html|IEFT 标准]]）。电子邮件库最初的开发是为了GNU Mailman从而使用了Python标准库，在此开发得以继续并且符合更多的标准，变得更加健壮。
 
@@ -35,7 +41,7 @@ Mailman中一个核心数据结构便是邮件报文（email message），表现
 
 容器部件还可以任意嵌套；这些被称为混合部件（multiparts），事实上可以变得更深。但是，不管它的复杂性，任何电子邮件都可以被建模为一棵树，它有一个单独的报文对象作为根节点。在Mailman中，我们常称之为报文对象树，并参考其根报文对象来传递这可树。图10.2显示了图10.1中的混合部件报文的对象树。
 
-![Figure 10.2: Message object tree of a complex MIME email message](http://aosabook.org/images/mailman/tree.png)
+![Figure 10.2: Message object tree of a complex MIME email message](http://aosabook.org/cdn/images/aosabook/mailman/tree.png)
 
 Mailman总是会以某种方式修改原始消息。有时，转换可以是相当良性的，如添加或删除表头。有时我们会完全改变报文对象树的结构，例如内容过滤器去除某些类型像是HTML、图片或者其他非文本部分的内容。Mailman甚至可能崩溃”multipart/alternatives”，其中报文既显示为普通的文本又显示为一些富文本类型，或添加了额外的部分，这部分包含着关于邮件列表本身的信息。
 
@@ -123,7 +129,7 @@ master会相应这四种信号，但工作量不会超过将其转交给其子�
 
 在图中，当规则匹配时，实心箭头指示消息流，而在规则不匹配时，点线箭头指示消息流。每个规则的结果记录在元数据字典中以便日后Mailman会精确地知道（并且能够报告）哪些规则匹配和哪些错过了。虚线箭头指示转换是无条件的，不管规则是否匹配。 
 
-![Figure 10.3: Simplified view of default chains with their links](http://aosabook.org/images/mailman/chains.png)
+![Figure 10.3: Simplified view of default chains with their links](http://aosabook.org/cdn/images/aosabook/mailman/chains.png)
 
 
 着重提醒的一点是，规则本身不根据结果来调度。在内置链中，每一个环节都与规则匹配时执行的动作相关。例如，当“循环”规则匹配（意思是，邮件列表之前看到过这个消息）时，该消息立即被传递给“丢弃”链，它将其登记后丢弃该消息。如果“循环”规则不匹配，则链中的下一个关联会处理这个消息。
@@ -141,7 +147,7 @@ master会相应这四种信号，但工作量不会超过将其转交给其子�
 ## 10.6.Handlers和Pipelines ##
 
 一旦一个消息以其方式通过链和规则，并且被同意发送，消息必须进一步处理，才可以交付给最终收件人。例如，一些表头可能会增加或删除，有些信息可能会得到一些额外的装饰以提供了重要的免责声明或信息，比如如何离开邮件列表。这些修改是由一个包含一系列handlers的管道执行的。在类似的链和规则下，管道和handlers是可扩展的，但对于一般情况，有大量的内置管道。Handlers有类似的接口，就如规则，接受邮件列表、消息对象和元数据字典。然而，与规则不同，handlers可以修改消息。图10.4说明了默认的管道和一组的handlers（为了简单一些handers被省略）。
-![Figure 10.4: Pipeline queue handlers](http://aosabook.org/images/mailman/pipeline.png)
+![Figure 10.4: Pipeline queue handlers](http://aosabook.org/cdn/images/aosabook/mailman/pipeline.png)
 
 
 例如，一个发布的消息需要有一个优先级''Precedence''：在表头添加，告诉其他自动化软件这个消息来自邮件列表。这表头是事实标准，以防止一些闲置程序响应邮件列表。通过“add headers”handler将其添加到表头（在其他表头修改之间）。与规则不同的是，handler顺序通常不重要，而消息总是流过管道中的所有handlers。

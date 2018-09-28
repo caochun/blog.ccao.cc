@@ -1,3 +1,9 @@
+---
+title: Matplotlib_2
+date: 2018-09-28
+tags: aosabook
+---
+
 ##matplotlib翻译##      
                                    
 **翻译人员：马浩杰**
@@ -19,7 +25,7 @@ matplotlib是基于Python的绘图库，广泛用于Python科学计算界。它�
 
 所以matplotlib这一GTK+应用程序最初便被开发成EEG/ECoG可视化工具。这样的用例决定了它最初的软件架构。matplotlib最初的设计也服务于另一个目的：代替命令驱动的交互式图形生成（这一点MATLAB做得很好）工具。MATLAB的设计方法使得加载数据文件与绘图这样的任务非常简单，而要使用完全面向对象的API则会在语法上过于繁琐。所以matplotlib也提供状态化的脚本编程接口来快速、简单地生成与MATLAB类似的图形。因为matplotlib是Python库，所以用户可以使用Python中各种丰富的数据结构，如列表、辞典与集合等等。
 
-![](http://www.aosabook.org/images/matplotlib/ecog.png)
+![](http://www.aosabook.org/cdn/images/aosabook/matplotlib/ecog.png)
 
 图11.1：最初的matplotlib程序——ECoG查看器
 
@@ -72,10 +78,10 @@ plt.show()
 
 Artist层次结构处于matplotlib的中间层，负责很大一部分繁重的计算任务。延续之前将后端的FigureCanvas看作画纸的比喻，Artis对象知道如何用Renderer（画笔）在画布上画出墨迹。matplotlib中的Figure就是一个Artist对象实例。标题、直线、刻度标记以及图像等等都对应某个Artist实例（如图11.3）。Artist的基类是matplotlib.artist.Artist，其中包含所有Artist的共享属性，包括从美工坐标系统到画布坐标系统的变换（后面将详细介绍）、可见性、定义用户可绘制区域的剪切板、标签，以及处理“选中”这样的用户交互动作的接口，即在美工层检测鼠标点击事件。
 
-![](http://www.aosabook.org/images/matplotlib/artists_figure.png)
+![](http://www.aosabook.org/cdn/images/aosabook/matplotlib/artists_figure.png)
 图11.2：matplotlib生成的图形
 
-![](http://www.aosabook.org/images/matplotlib/artists_tree.png)
+![](http://www.aosabook.org/cdn/images/aosabook/matplotlib/artists_tree.png)
 图11.3：用于绘制图11.2的Artist实例的层次结构
 
 Artist层于后端之间的耦合性存在于draw方法中。譬如，下面假想的SomeArtist类是Artist的子类，它要实现的关键方法是draw，用来传递给后端的渲染器。Artist不知道渲染器要向哪种后端进行绘制（PDF、SVG与GTK+绘图区等），但知道Renderer的API，并且会调用适当的方法（draw_text或draw_path）。因为Renderer能访问画布，并且知道如何绘制，所以draw方法将Artist的抽象表示转换为像素缓存中的颜色、SVG文件中的轨迹或者其他具体表示。
@@ -151,7 +157,7 @@ plt.savefig('matplotlib_histogram.png')
 plt.show()
 ```
 
-![](http://www.aosabook.org/images/matplotlib/histogram_demo.png)
+![](http://www.aosabook.org/cdn/images/aosabook/matplotlib/histogram_demo.png)
 图11.4：用pyplot绘制的柱状图
 
 pyplot是一个状态化接口，大部分工作是处理样本文件的图形与坐标的生成，以及与所选后端的连接。它还维护了模块级的内部数据结构。这些数据结构表示了直接接收绘图命令的当前图形与坐标
@@ -202,24 +208,24 @@ matplotlib花费很多时间将一个坐标系变换到另一个。这些坐标�
 
   每个Artist都有一个知道如何从一个坐标系转变到另一个的转换节点．这些节点构成一个有向图．沿着有向图的边走到根，可以将原始数据值转换为最终在文件中的输出坐标．这使得点击一个元素来获取它的数值坐标变得可能．这张图表达了节点之间的依赖关系，当一个父节点的转换改变以后，例如当artist的限制改变时，与该轴的任何转换是无效的，因为他们将需要重新绘制。有关在图中的其他轴变换，当然也可单独使用左，防止不必要recomputations和有助于更好地交互性能。
 变换节点可以是简单仿射变换和非仿射变换。仿射变换是保持距离的直线和比例，包括旋转，平移，缩放和倾斜变换的一系列变换。二维仿射变换使用的3×3仿射变换矩阵表示。转化点（x'，y'）是原始点（x，y）进行通过下面矩阵变换得到的:
-![](http://aosabook.org/images/matplotlib/matrix.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/matrix.png)
 
 
 二维坐标可以很容易地通过变换矩阵相乘来进行变换。仿射变换也有，他们可以利用矩阵乘法可以相互组合的有用的属性。这意味着，要执行一系列仿射变换，该变换矩阵可首先相乘一次，所得矩阵可以用于转化坐标。matplotlib的转型框架自动组成（冻结）仿射变换变换坐标，以减少计算量前矩阵在一起.拥有快速仿射变换是很重要的，因为它使得交互式平移和在GUI窗口更有效的放大。
 在matplotlib非仿射变换使用Python函数定义的，所以他们是真正的随心所欲。在matplotlib核心，非仿射变换用于对数缩放，极坐标图和地理的预测（图11.5）。这些非仿射变换在转换图中可以和仿射变换自由混合。matplotlib将自动简化仿射部和仅回落到用于非仿射部的任意函数。
-![](http://aosabook.org/images/matplotlib/nonaffine_transforms.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/nonaffine_transforms.png)
 从这些简单的作品，matplotlib可以做一些非常先进的东西。混合变换是使用一个x轴变换和一个y轴变换的特殊变换节点。当然，这是唯一可能的，如果给定的变换为“可分离”，意思是在x和y坐标是独立的，但在变换本身可以是仿射或非仿射。这是用来，例如，绘制对数曲线，其中任一个或两个x和y轴的可具有对数刻度。具有混合的变换节点允许可扩展到以任意的方式组合。变换图允许的另一件事是轴的共享。这使得当进行平移和缩放"link"一条线的极限到另一条成为可能，在这种情况下，相同的变换节点简单地两个轴，这甚至可能在两个不同的数字之间共享。图11.6显示了一个例子变换图的一些工作，这些先进的功能。axes1具有对数X轴;axes1和axes2共享相同的Y轴。
-![](http://aosabook.org/images/matplotlib/transform_tree.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/transform_tree.png)
 #### 11.5. The Polyline Pipeline ####
 当标绘线图，也有一些用于把原始数据绘制为屏幕上的线的步骤。在matplotlib的早期版本中，所有这些步骤都纠结在一起。此后，它们被重构，实现为一个“路径转换”流水线中的不连续步骤。这使得每个后端可以选择流水线的某一部分来执行，因为流水线的一些部分只在某些情况下是有用的.
   * 变换：从数据坐标转换为坐标图坐标。如果这是一个纯粹的仿射变换，如上所述，这是作为一个矩阵乘法一样简单。如果这涉及任意变换，变换函数被调用的坐标转换成数字空间。
   * 处理数据丢失:该数据阵列可能有部分在数据丢失或无效。用户可以通过这些值设定为NaN时，或使用numpy的掩蔽阵列任表明这一点。矢量输出格式，如PDF和渲染库，如此Agg，不经常有绘制一个折线时丢失数据的概念，因此，管道的这一步必须用MOVETO命令，告知在丢失的数据段跳跃渲染拿起笔，开始在一个新的点上重新绘制。
   * 剪裁:图中的边界之外的点可以通过包括许多看不见的点增加文件大小。更重要的是，非常大或非常小的坐标值可以在输出文件的渲染，这会导致完全混乱的输出导致溢出错误。管道剪辑的这一步骤，因为它进入和退出图中的边缘，以防止这两个问题的折线。
   * 贴紧：完美垂直线和水平线可以看模糊由于抗混叠时它们的中心未对准到一个像素的中心（参见图11.7）。流水线的捕捉步骤首先确定整个折线是否是由水平和垂直段（例如一个轴对齐的矩形），且如果是这样，轮每个所得顶点到最接近的像素中心。这个步骤仅用于光栅后端，因为矢量后端应继续精确的数据点。在屏幕上查看时的矢量文件格式，如Adobe Acrobat一些渲染器，执行像素贴紧。
-![](http://aosabook.org/images/matplotlib/pixel_snapping.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/pixel_snapping.png)
 Figure 11.7: A close-up view of the effect of pixel snapping. On the left, without pixel snapping; on the right, with pixel snapping.
   * 简化：当绘制真的密集的地块，很多就行了点，实际上可能不是可见的。这是尤其如此表示嘈杂的波形图的。包括在剧情这些点增加文件大小，甚至可能打在允许的文件格式点的数量限制。因此，准确的落在他们的两个相邻点之间的线路上的任何点都拆除（见图11.8）。确定取决于基于什么是可见的由用户指定的一个给定的分辨率的阈值。
-![](http://aosabook.org/images/matplotlib/path_simplification.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/path_simplification.png)
 Figure 11.8: The figure on the right is a close-up of the figure on the left. The circled vertex is automatically removed by the path simplification algorithm, since it lies exactly on the line between its neighboring vertices, and therefore is redundant.
 
 #### 11.6. Math Text ####
@@ -237,7 +243,7 @@ mathtext是TeX的数学渲染引擎的直接端口，粘到使用pyparsing [McG0
 作为第二步，这个步骤是自动的。当前matplotlib测试脚本生成多个重复的，但不是需要人工干预，这些地块被自动与基线相比的图像。所有的测试都是nose测试框架，这使得它非常容易产生哪些测试失败的报告内运行。
 复杂的问题是，图像比较不能精确。
 在FreeType字体渲染库版本的细微变化可以使文本的输出在不同的机器略有不同。这些差异是不够的，被认为是“错误的”，但足以甩开任何确切位对位比较。取而代之的是，测试框架计算两个图像的直方图，并计算它们的差的根均方。如果该差大于给定的阈值，则图像被认为过于不同，并比较测试失败。如果测试失败，差分图像生成该节目在哪里发生了变化曲线（见图11.9）。那么开发人员可以决定是否失败是由于故意的变化和更新基线图像匹配新的形象，还是决定形象，其实是不正确的，跟踪并解决引起变化的bug。
-![](http://aosabook.org/images/matplotlib/regression.png)
+![](http://aosabook.org/cdn/images/aosabook/matplotlib/regression.png)
 
 
 

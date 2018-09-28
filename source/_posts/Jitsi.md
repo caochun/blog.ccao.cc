@@ -1,3 +1,9 @@
+---
+title: Jitsi
+date: 2018-09-28
+tags: aosabook
+---
+
 # Jitsi中文翻译 #
 ## Chapter 10. Jitsi引言 ##
 Jitsi是一个允许人们进行视频和语音通话，共享桌面和交换文件和消息的应用。更重要的是它允许人们通过大量不同的的协议，从标准化的 XMPP（可扩展消息和状态协议）和 SIP（会话初始化协议）到专有的如雅虎和 Windows Live信使 (MSN)来做这些事情。它可以在微软视窗、苹果 Mac OSX、Linux，FreeBSD上运行。它大部分是用java编写的，但也包含部分用机器码编写的代码。在本章中，我们将会看到Jitsi 的基于 OSGi 的体系结构，看看它是如何实现和管理协议的，并回顾一下，我们能从构建这个软件中学到什么。
@@ -22,7 +28,7 @@ Jitsi是一个允许人们进行视频和语音通话，共享桌面和交换文
 
 图10.1：OSGI句柄的激活
 
-![](http://aosabook.org/images/jitsi/OSGI.png)
+![](http://aosabook.org/cdn/images/aosabook/jitsi/OSGI.png)
 
 那么让我们看一下它真正是怎么工作。想象一个不停地存储和恢复特性（*properties*）的服务，在Jitsi里面我们把它叫做配置服务（*ConfigurationService*），像下面的代码所示的那样：
 ```
@@ -100,7 +106,7 @@ public class RandomBundleActivator implements BundleActivator
 
 图10.2服务结构
 
-![](http://aosabook.org/images/jitsi/PKGs.png)
+![](http://aosabook.org/cdn/images/aosabook/jitsi/PKGs.png)
 
 ## 10.3.构建和运行一个句柄（Building and Running a Bundle） ##
 既然我们已经知道如何在一个句柄里面写代码，接下来让我们谈一下包。所有的句柄在运行的时候需要给OSGi环境指示三个不同的东西，对其他人可见的java包（例如外部包），还有他们想要从其它人那里使用的包（例如输入包），还有他们句柄激活器类的名字。句柄通过他们将要被部署进的jar文件的证明来做这件事情。
@@ -199,7 +205,7 @@ public <T extends OperationSet> T getOperationSet(Class<T> opsetClass);
 
 图10.4：不同设备的媒体流
 
-![](http://aosabook.org/images/jitsi/Media.png)
+![](http://aosabook.org/cdn/images/aosabook/jitsi/Media.png)
 ### 10.5.2. 多媒体数字信号解码器（Codecs） ###
 另一个在媒体流中的重要概念是关于媒体格式的（
 MediaFromats

@@ -1,9 +1,15 @@
+---
+title: Violet
+date: 2018-09-28
+tags: aosabook
+---
+
 # 作者的话 #
 
 2002年，我写了一本关于面向对象设计与模式的本科教材 http://www.aosabook.org/en/bib1.html#bib:horstmann:oodp|Hor05。 和很多书一样，写这本书的动力也源于我对经典课程的失望。一般来说，计算机科学专业的学生，会在他们的第一门编程课上，学习如何设计一个独立的类。然后，直到在高年级的软件工程课中，他们才在面向对象设计方面接受更多的训练。在那门课程中，学生在几个星期内匆忙地学习UML和设计模式，最终也只是走马观花。我这本书是为一个学期的课程准备的，学生需要具备一些Java编程和基本数据结构的知识（通常这些知识来自基于Java的CS1或CS2课程安排①）。这本书在学生所熟悉的内容中涵盖了面向对象设计原则和设计模式的内容。比如用Swing里面的''JScrollPane''类来介绍修饰模式（DecoratorPattern），目的是希望这个例子比经典的Java流的例子更容易让人记住。
 > ①译者注：这是国外的计算机专业的课程模式
 
-![图22.1：Violet里的对象图（Object Diagram）](http://www.aosabook.org/images/violet/object-sample.png)
+![图22.1：Violet里的对象图（Object Diagram）](http://www.aosabook.org/cdn/images/aosabook/violet/object-sample.png)
 
 在这本书里，我需要一种轻量级的UML，包括类图、时序图，以及能够显示出Java对象引用的一种对象图（见图22.1）。我还想让学生能够绘制他们自己的UML图。然而，像Rational Rose这样的商业软件，不仅价格昂贵，还难以学习 http://www.aosabook.org/en/bib1.html#bib:shumba:ratrose|Shu05 。而在当时可用的开源替代品，要么功能有限要么缺陷很多①。比如需要使用文字来描述UML图，而不是使用更常见的点击式的界面。特别是ArgoUML软件中的时序图，根本无法使用。
 
@@ -39,7 +45,7 @@ Violet是基于一个通用的图形编辑框架，这个框架能够渲染和�
 
 > ①译者注：railroad diagram，又称语法图，是形式文法的一种图形化表示方法。
 
-![图 22.2：该图形编辑框架的一个简单实例](http://www.aosabook.org/images/violet/Ch8-06.png)
+![图 22.2：该图形编辑框架的一个简单实例](http://www.aosabook.org/cdn/images/aosabook/violet/Ch8-06.png)
 
 为了更好地解释这个框架，我们来考虑一个非常简单的图形编辑器，它只包括黑色和白色圆节点以及直线边（图22.2）。下面的''SimpleGraph''定义了节点和边的原型对象，解释了原型模式是什么：
 ```
@@ -70,7 +76,7 @@ public class SimpleGraph extends AbstractGraph
   * Edge接口中的''getConnectionPoints''方法可以产生边的俩个端点。这个方法在选中边进行拖动等操作的时候有用。
   * 一个节点可以有随他一起移动的子节点。有很多的方法被提供来枚举和管理这些子节点。
 
-![图22.3：找出节点边界上的一个连接点](http://www.aosabook.org/images/violet/Ch8-07.png)
+![图22.3：找出节点边界上的一个连接点](http://www.aosabook.org/cdn/images/aosabook/violet/Ch8-07.png)
 
 辅助类''AbstractNode''和''AbstractEdge''实现了大部分的接口要求的方法，类''RectangularNode''和''SegmentedLineEdge''分别提供了可输入一小段文字的方形节点和由线段构成的边的完整实现。
 
@@ -128,7 +134,7 @@ public class LineEdge extends AbstractEdge
 }
 ```
 
-![图22.4：简单图形编辑器的类图](http://www.aosabook.org/images/violet/SimpleGraph-in-Violet.png)
+![图22.4：简单图形编辑器的类图](http://www.aosabook.org/cdn/images/aosabook/violet/SimpleGraph-in-Violet.png)
 
 总的来说，Violet为编写图形编辑器提供了一个简单的框架。通过定义节点和边的类，以及在图形类中提供绘制原型节点和边对象的方法，来实现一个编辑器实例。
 
@@ -365,7 +371,7 @@ Alexandre 还增加了对侧边栏、状态栏、欢迎面板、启动闪屏的�
 
 上述每种操作都有一个很明显的撤消方法。比如，“增加一个节点”的撤消方法就是删掉这个节点，“移动一个节点”的撤消方法就是按相反的向量移动这个节点。
 
-![图22.6：撤消操作必须撤消模型中的结构化的更改](http://aosabook.org/images/violet/undo.png)
+![图22.6：撤消操作必须撤消模型中的结构化的更改](http://aosabook.org/cdn/images/aosabook/violet/undo.png)
 
 注意，这些原子操作不同于用户界面的动作，也不同于这些动作所调用的''Graph''接口的方法。比如，考虑图 22.6 中的顺序图，假设用户从左侧的方法调用框拖动鼠标到右侧的对象生命线，当鼠标被松开时，下面的方法会被调用：
 

@@ -1,3 +1,9 @@
+---
+title: LLVM
+date: 2018-09-28
+tags: aosabook
+---
+
 这一章节讨论了一些对 LLVM((http://llvm.org )) 有重大影响的设计决策。LLVM 是涵盖一系列紧密结合的底层工具链组件（比如汇编器、编译器、调试器等）的维护和开发的总项目，设计目标是与现有的工具兼容，特别是 Unix 系统的工具。"LLVM" 曾经是一个缩写词，但是现在仅仅是这个项目的代名词。虽然 LLVM 有一些独特的功能，并且因其优秀的工具而出名（比如 Clang 编译器((http://clang.llvm.org ))，一个比 GCC 更好用的 C/C++/Objective-C 的编译器），但 LLVM 的内部架构才是它与其它编译器区分开来的主要原因。
 
 自 2000 年 12 月项目诞生起，LLVM 便致力于提供一组接口清晰的的可复用库。当时，开源编程语言的具体实现只针对特定用途，往往是单体的可执行文件。在静态分析和代码重构时，这不利于复用静态编译器（比如 GCC）的语法分析器。虽然脚本语言经常提供将运行时和解释器嵌入更大规模的应用中的方法，但是它们的运行时也是不可拆分的、臃肿的代码，只能整体包含。当时没有办法复用这些具体实现的特定功能，同时语言具体实现工程之间也极少进行代码共享。
@@ -11,7 +17,7 @@
 三段式设计在传统静态编译器中最为流行（比如大多数 C 编译器），它的主要组件是前端、优化器和后端（<imgref three_phases>）。前端分析源代码，检查错误并构建针对该语言的抽象语法树来表示输入的源代码。抽象语法树可以为优化而进一步转换成新的表示方式，然后让优化器和后端处理这段新代码。
 
 
-![三段式编译器的主要部件]( http://aosabook.org/images/llvm/SimpleCompiler.png)
+![三段式编译器的主要部件]( http://aosabook.org/cdn/images/aosabook/llvm/SimpleCompiler.png)
 
 优化器负责用各种各样的转换来提高代码的运行效率，比如消除冗余计算。这一行为或多或少独立于源语言和目标格式。之后后端（又叫代码生成器）将代码映射到目标指令集。保证代码正确性之余，后端还要生成高质量的代码，使得它们能够利用目标架构的特性。编译器后端的常见部分包括指令选择、寄存器分配和指令排序。
 
@@ -22,7 +28,7 @@
 当编译器希望支持多种语言或目标架构时，经典的三段设计的价值就凸显出来了。如果编译器在优化器中使用通用代码表示，那么就能为任何语言编写前端，为任何目标编写后端，只要它们能转化到通用代码或者由通用代码生成，如 <imgref retarget> 所示。
 
 
-![可重定目标能力](http://aosabook.org/images/llvm/RetargetableCompiler.png)
+![可重定目标能力](http://aosabook.org/cdn/images/aosabook/llvm/RetargetableCompiler.png)
 
 
 这个设计下，移植编译器以支持新的源语言（比如 Algol 或 BASIC）需要实现一个新的前端，但是现存的优化器和后端可以被复用。如果这些部分没有分离，实现一个新的源语言需要从零开始，于是支持 N 个目标和 M 个源语言就需要 N × M 个编译器。
@@ -152,7 +158,7 @@ for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I)
 在基于 LLVM 的编译器中，前端负责对输入代码进行语法分析，语义验证和错误诊断，然后把分析后的代码翻译成 LLVM IR （通常是构造 AST 然后将 AST 转换成 LLVM IR，但不一定）。中间代码可以经过送入一系列分析和优化流程得到改进，然后传入代码生成器，产生本地机器码，如 <imgref llvm_three_phases> 所示的那样。这是三段式设计的直观实现，但是这种泛泛的描述掩盖了 LLVM 架构从 LLVM IR 所衍生出来的强大功能和灵活性。
 
 
-![]( http://aosabook.org/images/llvm/LLVMCompiler1.png)
+![]( http://aosabook.org/cdn/images/aosabook/llvm/LLVMCompiler1.png)
 
 
 ### 11.4.1. LLVM IR 是一个完备的代码表示 ###
@@ -192,7 +198,7 @@ FunctionPass *createHelloPass() { return new Hello(); }
 
 LLVM 优化器基于代码库的设计使得实现者不仅可以定制过程执行的顺序，还可以只选择对图像处理有意义的过程：如果所有事物都被定义成单一的庞大的函数，花时间在内联上就没有意义了；如果基本没有指针，那么别名分析和内存优化不值得去考虑。尽管我们尽了最大的努力，但是 LLVM 并不能魔幻般地解决所有的优化问题！因为过程子系统是模块化的并且 PassManager 本身不知道过程的内部情况，实现者可以自由地实现他们自己的优化过程，针对特定语言，以弥补 LLVM 优化器的不足，或者明确针对特定语言的优化时机。<imgref XYZ> 展示了一个假想的 XYZ 图像处理系统的简单例子：
 
-<imgcaption XYZ>![]( http://aosabook.org/images/llvm/PassLinkage.png  | 图 11.4: 假想的使用 LLVM 的 XYZ 系统 }}</imgcaption>
+<imgcaption XYZ>![]( http://aosabook.org/cdn/images/aosabook/llvm/PassLinkage.png  | 图 11.4: 假想的使用 LLVM 的 XYZ 系统 }}</imgcaption>
 
 一旦一组优化策略被选定（并且也对代码生成器做了相似的决策），图像处理编译器会构建成一个可执行文件或动态链接库。因为对 LLVM 优化过程的引用只有简单的创建函数，它们被定义在对应的 ''.o'' 文件中，并且因为优化器位于 ''.a'' 归档库中，只有实际用到的优化过程会真正地链接到最终的应用，而不是链接上整个 LLVM 优化器。在上述例子中，因为有对 PassA 和 PassB 的引用，它们会被链接进来。因为 PassB 使用了 PassD 去做一些分析，PassD 也会被链接进来，因为 PassC（以及许多其它的优化）没有被使用，那么它的代码不会被链接进图像处理应用。
 
@@ -210,7 +216,7 @@ LLVM 代码生成器负责将 LLVM 转换成特定目标的机器码。一方面
 
 mix 和 match 方法使得目标作者可以选择对架构有意义的内容并且允许跨平台复用大量的代码。这带来了另一个挑战：每个共享的组件需要能够以通用的方式导出目标相关的属性。比如，一个共享的寄存器分配器需要知道每个目标的寄存器堆以及在指令和寄存器操作数之间存在的约束。LLVM 的解决方案是使用声明式的领域专用语言（domain-specific language, DSL）（一组 ''.td'' 文件）为每一个目标提供目标描述，这个 DSL 由 tblgen 工具处理。（简化的）构建 x86 目标的过程如 <imgref description> 所示：
 
-<imgcaption description>![]( http://aosabook.org/images/llvm/X86Target.png  | 简化的 x86 目标描述 }}</imgcaption>
+<imgcaption description>![]( http://aosabook.org/cdn/images/aosabook/llvm/X86Target.png  | 简化的 x86 目标描述 }}</imgcaption>
 
 ''.td'' 文件支持的不同子系统使得目标作者能够构建目标的不同部分。比如，x86 后端定义了一个寄存器类，包含所有的 32 位寄存器，命名为 "GR32" （在 ''.td'' 文件，目标专用定义都是大写的），像下面这样：
 
@@ -248,7 +254,7 @@ def NOT32r : I<0xF7, MRM2r,
 
 链接时优化解决了这样一个问题：传统的编译器因为每次只能观察到一个翻译单元（比如，一个 ''.c'' 文件和它依赖的所有头文件），所以不能跨文件进行优化（比如内联）。LLVM 编译器比如 Clang 通过 ''-flto'' 或 ''-O4'' 命令行选项来支持链接时优化。这个选项告知编译器产生 LLVM bitcode，存储在 ''.o'' 文件中，而不是本地目标文件，并且把代码生成时间延迟到链接时，如 <imgref linkage> 所示：
 
-![]( http://aosabook.org/images/llvm/LTO.png)
+![]( http://aosabook.org/cdn/images/aosabook/llvm/LTO.png)
 
 
 不同的操作系统可能在细节上有差异，但是要点是链接器能识别 ''.o'' 文件是 LLVM bitcode 而不是本地目标文件。当发现这点，它将所有的 bitcode 文件读入内存，把它们链接起来，然后在这个聚集上运行 LLVM 优化器。因为优化器现在能看到更多的代码，它可以跨文件地进行内联、常量传播、更激进的死码删除，以及更多的优化。尽管现代编译器也支持 LTO（链接时优化），它们中的大多数（比如 GCC、Open64、ICC 等等）通过代价昂贵的并且耗时的序列化过程来实现这个功能。在 LLVM 中，LTO 从系统的设计中自然而然地产生，并且能在不同的源语言上发挥作用（不像其它编译器），因为 IR 真正地独立于源语言。
@@ -256,7 +262,7 @@ def NOT32r : I<0xF7, MRM2r,
 安装时优化的思想是把代码生成延迟，甚至是在链接时之后，一直到安装时再做。如 <imgref install> 所示。安装时是一个非常有趣的时刻（比如软件包装、下载、上传到一个移动设备等等），因为这时你才能了解作为目标的设备的规格。以 x86 家族为例，它的芯片很多，特性不同。通过延迟指令选择、调度以及其它代码生成方面的工作，你可以为最终运行应用的特定硬件做出最优的选择。
 
 
-![]( http://aosabook.org/images/llvm/InstallTime.png)
+![]( http://aosabook.org/cdn/images/aosabook/llvm/InstallTime.png)
 
 
 ### 11.6.2. 对优化器做单元测试 ###
