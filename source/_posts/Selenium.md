@@ -1,3 +1,9 @@
+---
+title: Selenium
+date: 2018-09-28
+tags: aosabook
+---
+
 # Selenium WebDriver中文翻译 #
  
 原文来自《开源软件架构》（The Architecture of Open Source Applications）书中的 “ http://aosabook.org/en/selenium.html |Selenium WebDriver ”章节。
@@ -169,10 +175,10 @@ public interface Shop extends HasBalance, Stockable { }
 
 我发现了''UnsupportedOperationExceptions'' 的异常抛出，非常令人不愉快，但是需要允许有部分功能能够暴露给一些需要使用这些功能的用户，但是却不会把其余的API暴露给大多数用户。为此，WebDriver管饭使用基于角色的接口。例如，有一个''JavascriptExecutor''接口是用于提供在当前页面的上下文中执行Javascript任意块的能力。一个成功的WebDriver映射是一种能够期望它的方法能够有效的接口。
 
-^![](/images/67.png)
+^![](/cdn/images/aosabook/67.png)
  |    [图16.1：基于Shop的Accountant和Stockist]     |
 
-^![](/images/68.png)
+^![](/cdn/images/aosabook/68.png)
  |    [图16.2：实现了HasBalance和Stockable接口的Shop]     |
  
  
@@ -210,7 +216,7 @@ public interface Shop extends HasBalance, Stockable { }
 
 像大多数的大型项目一样，Selenium使用了分层结构的库。最底层是Google的Closure Library，它提供的原语和模块化机制允许源文件尽可能的小而集中。往上一层是一个实用函数库，提供了从简单的任务，比如获取一个属性的值，通过判断一个元素对某个终端用户是否可见，到复杂得多的一个动作，比如使用一个合成事件来模拟点击动作。在项目中，这些被视为提供了浏览器自动化的最小单位，因此被称为浏览器自动化原子(Browser Automation Atoms)或原子(atoms)。最后，为了满足WebDriver和Core的API，提供了一个整合了原子的适配器层。
 
-^![](/images/69.png)
+^![](/cdn/images/aosabook/69.png)
  |    [图16.3：Selenium Javascript库的层次结构]     |
 
 选择Closure库是由于以下几个原因。最主要的原因是Closure的编译器理解这个库所使用的模块化技术，Closure的编译器是一个针对以Javascript为输出语言的编译器。“编译(Compilation) ”可以像决定文件依赖顺序、链接文件并漂亮的把它们打印出来一样简单，也可以像预先优化和删除死码(dead code)一样复杂。另一个不可否认的优点是，项目组做Javascript这一部分编码的部分成员非常熟悉Closure库。
@@ -312,7 +318,7 @@ http://localhost:7055/hub/session/XXX/element/some_opaque_id/attribute/row
 
 因为我们执行的方法是幂等[4]，HTTP的正确的使用方法是GET。我们委托一个Java库，来处理HTTP（Apache的HTTP客户端）调用服务器。
 
-^![](/images/70.png)
+^![](/cdn/images/aosabook/70.png)
  |    [图16.4：Firefox的驱动程序体系结构概述]     |
 
 FireFox的driver被实现为Firefox扩展，其中在图16.4中展示出的基本设计，有点不同寻常，它具有一个嵌入式HTTP服务器。虽然最初我们使用的是一个我们自己已经建立的，写XPCOM的HTTP服务器是不是我们的核心竞争力之一，所以当机会出现，我们用由Mozilla自己写的一个基本的HTTPD取而代之。请求被HTTPD接受后，几乎马上传递给一个''dispatcher''对象。

@@ -1,3 +1,9 @@
+---
+title: NoSQL
+date: 2018-09-28
+tags: aosabook
+---
+
 # 13. NoSQL生态系统 #
 
 > Unlike most of the other projects in this book, NoSQL is not a tool, but an ecosystem composed of several complimentary and competing tools. The tools branded with the NoSQL monicker provide an alternative to SQL-based relational database systems for storing data. To understand NoSQL, we have to understand the space of available tools, and see how the design of each one explores the space of data storage possibilities.
@@ -355,7 +361,7 @@ Twitter利用分片和保存副本的概念构建了一个叫做Gizzard的协调
 
 #### Hash Rings by Example ####
 
-![](http://www.aosabook.org/images/nosql/hashring.png)
+![](http://www.aosabook.org/cdn/images/aosabook/nosql/hashring.png)
 
 Figure 13.1: A Distributed Hash Table Ring
 
@@ -407,7 +413,7 @@ Google的BigTable论文描述了一种利用范围分区的层次型技术将数
 
 每个tablet所保存的数据的大小为100-200MB。随着tablet的大小不断变化，键范围相邻的两个比较小的tablet也可能会合并为一个tablet。主服务器会对各tablet的大小、负载以及tablet 服务器的可用性方面的情况进行分析。主服务器随时会对tablet服务器要服务于哪些tablet做出适当调整。
 
-![](http://www.aosabook.org/images/nosql/bigtable.png)
+![](http://www.aosabook.org/cdn/images/aosabook/nosql/bigtable.png)
 
 Figure 13.2: BigTable-based Range Partitioning
 

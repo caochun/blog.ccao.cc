@@ -1,3 +1,9 @@
+---
+title: Moodle
+date: 2018-09-28
+tags: aosabook
+---
+
 **Moodle**作者：Tim Hunt
 译者：朱凯文
 

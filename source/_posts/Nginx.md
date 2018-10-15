@@ -1,3 +1,9 @@
+---
+title: Nginx
+date: 2018-09-28
+tags: aosabook
+---
+
 # NginX #
 
 nginx（读作"engine x"）是俄罗斯软件工程师Igor Sysoev开发的免费开源web服务器软件。nginx在2004年发布后，就一直专注于高性能，高并发和低内存消耗问题。在基本的web服务器功能的基础上，nginx还具有一些额外的特性，比如负载均衡，缓存，访问控制，带宽控制，以及高效整合各种应用的能力，这些特性使nginx成为构架现代网站架构一个不错的选择。目前，nginx是互联网上第二流行的开源web服务器软件。
@@ -64,7 +70,7 @@ nginx模块化的架构通常允许开发者在不修改nginx核心的情况下�
 
 图14.1展示了nginx的高层架构
 
-![](http://www.aosabook.org/images/nginx/architecture.png)
+![](http://www.aosabook.org/cdn/images/aosabook/nginx/architecture.png)
 
 ### ''Worker''模型 ###
 

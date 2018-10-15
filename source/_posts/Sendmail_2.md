@@ -1,3 +1,9 @@
+---
+title: Sendmail_2
+date: 2018-09-28
+tags: aosabook
+---
+
 # Sendmail 翻译#
 原文地址：http://www.aosabook.org/en/sendmail.html
 
