@@ -13,7 +13,7 @@ timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://blog.aosabook.cc
+url: http://blog.ccao.cc
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -79,7 +79,7 @@ theme_config:
   copyright:
     since: 2018
     name: Chun
-    url: https://blog.aosabook.cc
+    url: https://blog.ccao.cc
   menu:
     Home: /
     About: /about
@@ -90,7 +90,7 @@ theme_config:
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/caochun/aosabook.cc.git
+  repo: https://github.com/caochun/blog.ccao.cc.git
   branch: gh-pages
 #  message: [message]
   name: Chun
@@ -102,12 +102,12 @@ deploy:
 qiniu:
   offline: false
   sync: true
-  bucket: aosabook
+  bucket: nemoworks
   # secret_file: sec/qn.json or C:
-  access_key: hf_OTa2nV0Taho84tpokRzn6Gm58mrjwu5QOPHGw
-  secret_key: -uwYx2tXAsUpSssc5YRH026F8qlzt_h5qCpC3OFK
+  access_key: F1sFdth7B0QirUZ4gyFuv8DRQN98zj-gh4r5Dbzo
+  secret_key: DBvoen9cqUzJc8SEnNa173K1gI1LfmL74u03z-6w
   dirPrefix: 
-  urlPrefix: http://pctozmwcv.bkt.clouddn.com/
+  urlPrefix: http://cdn.nemoworks.info/
   up_host: http://upload.qiniu.com
   local_dir: cdn
   update_exist: true
