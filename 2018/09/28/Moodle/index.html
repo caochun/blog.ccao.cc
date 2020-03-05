@@ -1,0 +1,178 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="index, follow"><title>Moodle • 不会写代码的架构师不是好程序猿</title><meta name="description" content="Moodle - 老曹同学"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="https://unpkg.com/nanoreset@3.0.1/nanoreset.min.css"><link rel="stylesheet" href="/css/theme.css"><link rel="search" type="application/opensearchdescription+xml" href="/atom.xml" title="不会写代码的架构师不是好程序猿"></head><body><div class="wrap" id="barba-wrapper"><header><h1 class="branding"><a href="/" title="不会写代码的架构师不是好程序猿">不会写代码的架构师不是好程序猿</a></h1><ul class="nav nav-list"><li class="nav-list-item"><a class="nav-list-link no-barba" href="/" target="_self">HOME</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="/about" target="_self">ABOUT</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="https://github.com/caochun/" target="_blank">GITHUB</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="/atom.xml" target="_self">RSS</a></li></ul></header><div class="barba-container"><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Moodle</h1><div class="post-info"><a></a>2018-09-28</div><div class="post-content"><p><strong>Moodle</strong>作者：Tim Hunt<br>译者：朱凯文</p>
+<p>Moodle是一个用于教育系统设计的web应用程序。<br>这一篇翻译将详细的讲解Moodle是怎么运作的，尤其是从以下这几个方面：</p>
+<ul>
+<li><p>用插件来分割应用方法</p>
+</li>
+<li><p>权限系统***-掌握着每个用户所拥有的权限</p>
+</li>
+<li><p>输出的方式以及多样化的主题皮肤，使得界面可以得到本地化</p>
+</li>
+<li><p>数据库抽象层</p>
+</li>
+</ul>
+<p>Moodle 为老师和学生提供了一个线上教学的环境。一个Moodle站点被划分为不同的课程。<br>每一个课程都有与之相对应的角色参与进来比如老师和学生。每一门课程都是由一系列的资源和活动组成。资源可能是一个PDF文件，一个Moodle内网的地址，或者是一些散步在网络中的资源链接。而活动可能是一个讨论，一次考试，或者是一个wiki。当用户在使用Moodle的时候这些资源和活动就可以按照某种方式被组织起来，比如说，他们可以按照逻辑上相关，或者是日程上的特定周目被分配到一起。</p>
+<p>Moodle 平台可以作为一个独立的应用程序，如果你想在网络上授课，你可以尝试下载Moodle 到你的服务器，安装并创建课程，然后学生就可以来注册并选课了。Moodle也可以作为一个系统运行，如果你是一个庞大的机构，您可能需要尝试完成以下的架构：</p>
+<p>一个管理夸系统的用户账号身份认证服务（例如使用LDAP）<br>一个学生信息系统。它其实就是一个庞大的数据库，里面记载着所有的学生信息，包括他们当前正在进行的课程，以及需要完成的课程，还有他们的笔记，这份笔记可以是他们都一门所完成课程的高度总结。当然，这个信息系统也可以提供其他的管理功能，比如跟踪一个学生是否上缴了学费。<br>一个文档库（比如使用Alfresco）。它用来储存文件，以及跟踪用户合作维护文件时的工作流。<br>一个电子档案袋。学生可以在这里存放他们自己的资料比如实验，简历等文件，或者是用来证明档案所有者以及满足了一门实践课的选修条件。<br>一个报告或分析工具。以产生高权限的信息，分析报告您所在的机构正在发生什么。</p>
+<p>相比其他为单一教育单位设计的系统，Moodle更专注于为所有参与到教学中的人提供一个在线平台。<br>Moodle仅仅为非主要功能提供了最基本的实现，所以它可以单独的作为一个应用，或者与其他系统进行集成。Moodle 扮演的角色被正式的称为虚拟教学环境（VLE），或者是教学/课程管理系统（LMS，CMS，甚至是LCMS）。</p>
+<p>Moodle是一个用pfp编写的开源免费软件。它可以在绝大多数的Web服务器和平台上运行。它需要一个数据库，目前支持MySQL，PostgreSql，Ms SQL Server以及Oracle。</p>
+<p><strong> Moodle运作方式综述 </strong></p>
+<p>安装Moodle的三个部分</p>
+<p>1 代码，通常在一个类似/var/www/moodle 或者 ~/htdocs/moodle 的目录里。Web服务器应该对这个目录不具有修改权限。<br>2 数据库，由上面提到过的几种RDMS管理。实际上，Moodle 给所有的表名增加了一个前缀。所以如果需要的话，它可以和其他应用共用一个数据库。<br>3 Moodledata 目录， 这个目录用于存储用户上传的文件以及系统生成的文件，同样Web服务器需要对这个目录拥有修改可写的权限。处于安全考虑，这个目录应该设置于Web根目录之外。<br>以上三部分可以完全部署在一台服务器上。或者，采用负载均衡设置，在每台Web服务器上都部署代码，但是仅仅共用一个数据库和一个moodledata目录。<br>当Moodle安装完毕后，上述的三部分的配置信息将被存储在Moodle根目录下的config.php文件中。</p>
+<p>调度请求<br>Moodle是一个Web应用，需要用户通过浏览器去使用它。从Moodle自己的角度来看，这就意味着它要响应HTTP请求。Moodle在一开始设计时URL的设计就是一个重要的考量，包括URL如何被调度到不同的脚本上。<br>Moodle这里采用标准的PHP方法。当你在浏览一个课程的主页时，URL可能像…/course/view.php?id=123，这里123就是这门课在数据库中的唯一标识。浏览一个论坛并参与讨论时，URL可能是…/mod/forum/discuss.php?id=456789。也就是说，这些特定的脚本，course/view.php或者mod/forum/discuss.php 会来处理这些请求。</p>
+<p>这对于开发者就很容易明白Moodle是怎么处理这类的请求了，你只需要看看URL，然后就可以去阅读那份php文件的代码了。但是这从用户的角度来看却是十分丑陋的，因为这些URL永久不变。比方说一个课程改了名字，或者某个管理员把一个讨论转移到另一个板块中，这些URL都不会变。<br>可以采取的另一种方法是设定唯一的入口…/index.php/[唯一的确定信息]。这个单独的index.php脚本会通过某种方式进行调度。这个方法调价了一个大多数软件开发者都喜欢用的间接层。但其实，没有这个间接层也并不会影响到Moodle的使用。</p>
+<p>插件<br>和许多其他成功的开源项目一样，Moodle是由一个系统内核协同许多各种功能的插件构建起来的。这是一个很好的注意，因为它可以使用户按照他们自己的喜好来增强Moodle的功能。这就是一个开源系统很重要的优势：你可以根据自己的特定需求来更改它。但是，就算拥有很好的版本控制系统，在系统升级时仍然可能会因为代码的高可定制性从而导致很多的问题。<br>Moodle的插件通过定义好的API与内核交互，它使得人们在定制病分享自己的Moodle时更加容易，并且在Moodle系统内核升级时也不会受到影响。<br>一个插件化的系统有多种不同的构建方法。Moodle具有一个相对庞大的内核，并且所有的插件都是强类型的。所谓的庞大的内核，指的是内核里已经提供了大量的功能。这其实违反了那类由一个小型的插件启动器引导，其余部分都是插件的架构设计。<br>所谓强类型的插件，是指根据你想实现的具体功能，你可能需要写完全不同的插件，实现不同的API。比如，一个新建活动模块插件会与一个新建认证插件截然不同。根据最后统计，我们现在一共有35种不同的插件。这违背了那类，所有插件都要通过使用最基本的API，通过注册它们感兴趣的项目和事件与内核进行交互的架构设计。<br>Moodle曾经有尝试把更多的功能移到插件中以减小内核，然而这并没有取得很明显的效果，因为当前Moodle有一个不断去扩展内核的趋势。还有一个趋势是尽可能的将不同种类的插件进行规范化。这样在许多公共功能上，比如安装和升级，所有的插件都可以按照统一的方式运行。</p>
+<p>Moodle的每一个插件其实就是一个包含许多文件的目录。每一个插件都有一个类型和名字，这两个构成了这个插件的”Frankenstyle”组件名称。插件类型和名字决定了这个插件目录的路径。插件类型给定一个前缀，目录名称就是这个插件的名字。<br>这里有一些例子。</p>
+<table>
+<thead>
+<tr>
+<th>插件类型</th>
+<th>插件名称</th>
+<th>Frankenstyle</th>
+<th>目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mod(Activity moudule)</td>
+<td>forum</td>
+<td>mod_forum</td>
+<td>mod/forum</td>
+</tr>
+<tr>
+<td>mod(Activity moudule)</td>
+<td>quiz</td>
+<td>mod_quiz</td>
+<td>mod/quiz</td>
+</tr>
+<tr>
+<td>block(Side-block)</td>
+<td>navigation</td>
+<td>block_navigation</td>
+<td>blocks/navigation</td>
+</tr>
+<tr>
+<td>qtype(Question type)</td>
+<td>shortanswer</td>
+<td>qtype_shortanswer</td>
+<td>question/type/shortanswer</td>
+</tr>
+<tr>
+<td>quiz(Quiz report)</td>
+<td>statistics</td>
+<td>quiz_statistics</td>
+<td>mod/quiz/report/statistics</td>
+</tr>
+</tbody>
+</table>
+<p>最后一个例子表明每一个活动模块被允许声明为一个插件的子插件。只有活动模块才能做到这点。这出于两点原因，首先如果所有的插件都可以声明为子插件类型，这可能会带来严重的性能问题，其次，活动模块是Moodle中最重要的教育活动，也是插件中最重要的类型，所以它们应该具有特殊的权限。</p>
+<p>插件示例：<br>我们接下来将以一个具体的插件实例来解释Moodle架构中的大量细节。作为一种传统，我们选择实现一个现实”Hello world”的插件。</p>
+<p>这个插件实际上并不适合任何一种Moodle标准插件。它只是一个简单的脚本，和其他任何东西都没有联系，所以我选择把它制作成一个’local’类型的插件。这是一个catch-all的插件类型，这种插件类型专门处理一些杂乱的功能，所以在这里非常的合适。不给我的插件命名为greet，所以它的Frankenstyle的名字是local_greet，路径为local/greet。</p>
+<p>每一个插件都必须包含一个叫做version.php 的文件，这个文件定义了关于这个插件本身的元数据。Moodle的插件安装系统会使用它来对插件进行安装和升级。例如local/greet/version.php包含代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">$plugin-&gt;component = &apos;local_greet&apos;;</span><br><span class="line"></span><br><span class="line">$plugin-&gt;version   = 2011102900;</span><br><span class="line"></span><br><span class="line">$plugin-&gt;requires  = 2011102700;</span><br><span class="line"></span><br><span class="line">$plugin-&gt;maturity  = MATURITY_STABLE;</span><br></pre></td></tr></table></figure>
+<p>由于可以从路径上明显的看出插件的名字，所以乍看之下代码里面包含组件的名称会略显多余。但事实上安装包需要通过组件名称来验证插件是否安装在正确的位子上。而你们可以给相同插件的不同版本标上对应的版本号。通常来说可以用版本的完成性比如ALPHA，BETA，RC等代号，或者是STABLE这样的标签，或者是Requires字段，Requires字段可以用来表示与Moodle兼容的最低版本号。必要的话，你也可以记录下这个插件依赖的其他插件。</p>
+<p>以下是这个简单插件的主要脚本（存储在local/greet/index.php）:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once(dirname(__FILE__). &apos;/../../config/php&apos;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">require_login();</span><br><span class="line"></span><br><span class="line">$context = context_system::instance();</span><br><span class="line"></span><br><span class="line">require_capability(&apos;local/greet:begreeted&apos;,$context);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$name = optional_param(&apos;name&apos;,&apos;,PARAM_TEXT);</span><br><span class="line"></span><br><span class="line">if(!$name)&#123;</span><br><span class="line"></span><br><span class="line">$name = fullname($USER);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">add_to_log(SITEID,&apos;local_greet&apos;,&apos;begreeted&apos;,</span><br><span class="line"></span><br><span class="line">&apos;local/greet/index.php?name=&apos;.urlencode($name));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$PAGE-&gt;set_context($context);</span><br><span class="line"></span><br><span class="line">$PAGE-&gt;set_url(new moodle_url(&apos;/lacal/greet/index.php&apos;), array(&apos;name&apos;=&gt; $name));</span><br><span class="line"></span><br><span class="line">$PAGE-&gt;set_title(get_string(&apos;welcome&apos;,&apos;local_greet&apos;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">echo $OUTPUT-&gt;header();</span><br><span class="line"></span><br><span class="line">echo $OUTPUT-&gt;box(get_string(&apos;greet&apos;,&apos;local_greet&apos;,format_string($name)));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">echo $OUTPUT-&gt;footer();</span><br></pre></td></tr></table></figure></p>
+<p>Line 1: 引导Moodle<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">require_once(dirname(__FILE__). &apos;/../../config/php&apos;);</span><br></pre></td></tr></table></figure></p>
+<p>这单独的一行是大多数插件都要首先完成的。之前提到过，config.php包含着Moodle如何连接数据库以及找到metadata目录的细节。引导功能在require_once(‘lib/setup.php’)结束，然而引导功能完成了：<br>1加载了左右Moodle标准库<br>2开始处理会话<br>3连接数据库<br>4初始化一系列全局变量。（一会儿你就明白了）</p>
+<p>Line 2： 检查用户是否登录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">require_login();</span><br></pre></td></tr></table></figure></p>
+<p>这行是的Moodle利用管理员配置过的任何认证插件来判断当前访问用户是否已经登录。如果尚未登录，则用户将被重新引导到用户登录界面。并且这个函数是不能撤回的。<br>一个与Moodle整合性更好的插件会在这里传递更多的参数，比如这个页面属于哪个课程或者哪个活动。然后调用的require_login仍然会检查当前用户是否参加了这门课程或者活动。如果该用户允许访问，则他就可以访问这门课程或者是观看这个活动；如果没有权限，那么适当的错误性息将被显示出来。</p>
+<p>13.2 Moodle中的角色和权限系统<br>接下来的两行代码将显示出如何检查用户是否有做某件事的权限。正如你所见，从开发者的角度来说，这些API都十分的简单。但是，实际上在这下面是一个非常复杂的接入系统。这会给管理员很大的伸缩性来控制每个人的权限。<br>Line 3： 获得上下文</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$context = context_system::instance();</span><br></pre></td></tr></table></figure>
+<p>在Moodle中用一个人可能在不同的地方拥有不同的权限。比如一个用户可能在某个课程上做一名老师，也可能在另一门课程中是一位学生。这些地方被称为上下文，上下文在Moodle 中构筑了一个特别像文件系统中目录结构那样的多层结构。而在这个结构的最上层是系统上下文，由于我们展示的代码不能很好的融入Moodle，它使用的是最上层的上下文。<br>系统中的上下文中，有许多的上下文信息被构造出来，他们负责维护那些为了阻止课程而被创建的不同分类。这些上下文可以是嵌套的，比如在一个分类里包含其他更多的分类。分类上下文同时也包含着课程上下文。最后，每一个课程中的活动也会拥有自己的Moodle上下文。</p>
+<p>Line 4： 检查用户是否有权执行这个脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">require_capability(&apos;local/greetbegreeted&apos;,$context);</span><br></pre></td></tr></table></figure>
+<p>在我们获得了上下文后，就可以检查权限了。某个用户能否执行某个功能的信息被称作能力（Capability）。基于能力的检车可以提供比简单的require_login检查更加细致的访问检查。在我们这个简单的插件中，只有一个能力：local/greet:begreeted。<br>这个价差通过require_capability 函数来完成，不过这需要这个能力的名字以及当前的上下文，就像其他require…函数一样，如果用户没有这个能力，则不会正常返回，而是现实一个错误。在其他地方，非致命的has_capability函数，当可用的时候返回true，比如要不要再另一个网页上添加对于当前这个脚本的一个链接。<br>那么管理员是如何配置什么用户拥有什么权限呢？这里显示的has_capability函数如何通过计算得到（至少理论上是这样的）：<br>1 从当前上下文开始； </p>
+<p>2 获得这个用户在当前上下文中所扮演的所有角色； </p>
+<p>3 计算出当前上下文中，每一个角色所拥有的权限； </p>
+<p>4 将这些权限整合起来获得一个最终的结果。</p>
+<p>定义能力<br>在下面一个例子中，一个插件可以根据它要提供的独特功能来定义新的能力。在每一个Moodle插件中都有一个子目录，叫db。这个目录包含了所有安装和升级这个插件所需的信息，期中有一个access.php文件来定义能力。下面就是我们插件的access.php，它位于Local/greet/db/access.php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">$capabilities = array(&apos;local/greet:begreeted&apos; -&gt;array(</span><br><span class="line"></span><br><span class="line">&apos;captype&apos; -&gt; &apos;read&apos;,</span><br><span class="line"></span><br><span class="line">&apos;contextlevel&apos; -&gt;CONTEXT_SYSTEM,</span><br><span class="line"></span><br><span class="line">&apos;archetypes&apos; -&gt; arrat(&apos;guest&apos;-&gt;CAP_ALLOW, &apos;user&apos; -&gt; CAP_ALLOW)</span><br><span class="line"></span><br><span class="line">));</span><br></pre></td></tr></table></figure>
+<p>这里定义了对于每个能力的元信息，这些元信息会在在狗仔权限管理用户界面的时候被用到。它规定了对于常见角色的默认权限。</p>
+<p>角色<br>Moodle 权限系统的下一部分就是角色了。一个角色其实就是一个权限集合的名字。当你登录到Moodle 后，你在系统上下文中就拥有一个Authenticated user 的角色。由于系统上下文储存在上下文结构的根节点，所以这个角色会被应用到所有的地方。<br>在一个特定的课程中，你可能是一个学生，那么这个角色就会在这个课程上下文中储存自己的信息，并在你访问该课程模块以及其子模块的上下文中都有效。然而在另一门课程中，你可能有一个不同的身份。例如，Grandgrind 先生可以是“Facts，Facts，Facts”这门课的教师，但是他却是职业发展课程“Facts Aren‘t Everything” 中的一名学生。 最后，一个用户或许会在特定的论坛（模块上下文）中被指派成为一个主持人（Moderator）的角色。</p>
+<p>权限<br>每一个角色对每一种能力都规定了一个权限。例如教师的角色很有可能被允许拥有moodle/course:manage，?但是学生角色就不会。但是教师和学生都会被允许有用mod/forum:startdiscussion。<br>角色通常是拥有全局性的，但是他们在每一个上下文中仍然可以被重新定义。比如说，某个wiki可以通过修改上下文中对于学生的mod/wiki:edit能力成禁止，来把学生的角色变成只读。<br>一般来说，有四种权限：</p>
+<ul>
+<li>未设置/继承（默认）</li>
+<li>允许</li>
+<li>预防</li>
+<li>禁止<br>在给定的上下文中，一个角色对每一个能力都有着四种权限之一。预防和禁止的一个重要区别是，禁止在预防的基础上海确保子上下文不能覆盖这个权限。</li>
+</ul>
+<p>权限整合<br>最后，一个用户在这个上下文中根据所有角色所获得的权限会被整合起来。</p>
+<ul>
+<li>如果任何角色对于一个能力给出的权限是禁止，那么返回false。</li>
+<li>否则，如果任何角色对于这个能力给出的权限是允许，那么返回true。</li>
+<li>再否则，返回false</li>
+</ul>
+<p>一个使用禁止权限的用例如下：<br>假设有一个用户在许多论坛中持续乱发帖，我们想让这个家伙立刻闭嘴。那么我们可以建立一个叫做捣蛋鬼的角色，这个角色对于类似mod/forum:post这样的能力全部设置为禁止。我们可以把这个捣蛋鬼的角色在系统上下文中分配给那个乱发帖子的用户。这样我们就能保证这个用户在所有论坛里面都不能发帖了。（然后可以跟这个学生好好谈谈，得到一个满意的答复，然后再把这个角色指派删除掉，这样他又能发帖了）<br>总而言之，Moodle的权限系统给了管理员很大的伸缩性。他们可以定义任何他们喜欢的角色，为这个角色的每一个能力指定不同的权限；他们可以在子上下文中改变角色的定义；<br>并且，他们还可以在不同的上下文中对用户赋予不同的角色。</p>
+<p>回到样例脚本<br>脚本的下一个部分解释了一些繁杂的任务；<br>Line 5：从请求中获得数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">￥name = optional_param(&apos;name&apos;,&quot;,PARSM_TEXT);</span><br></pre></td></tr></table></figure></p>
+<p>每一个网络应用程序都会做的事情就是，在不产生sql注入和跨站脚本攻击的前提下，把数据从请求中获取出来（通过GET或者POST变量），Moodle提供了两种方法来完成这件事。<br>上面那行代码就是一个简单的方法。它通过一个参数名（name），一个缺省值，以及一个期望类型来获取一个单独的值。期望类型是用来清理掉所有带有非法字符的输入。我们定义了许多类型，诸如PARAM_INT，PARAM_ALPHANUM，PARAM_EMAIL等等。<br>这里你也可以用类似 requires_param 这样的函数。这些require…函数如果发现期望的参数没有找到时会停止执行并显示一个错误信息。</p>
+<p>另一个Moodle从请求中获得数据的机制是来自一个非常成熟的库。它给PEAR的HTML QuickForm库套了一个包。（对于非PHP程序员来说，PEAR在PHP中相当于CPAN）。所以者貌似看起来是一个不错的选择，但是已经没有人在维护它了。或许在将来，我们会使用一种新的库，就如很多人希望的一样，因为QuickForm的很多使人诟病的设计。但是，目前来说，QuickForm就已经足够了。表单可以被定义为一个字段的集合（例如 text box, select drop-down, date-selector） 每个字段可能有不同用于前端或后端验证的字段（包括 PARAM_…类型）</p>
+<p>Line 6： 全局变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(!$name)&#123;</span><br><span class="line">$name = fullname($USER);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数显示了Moodle所提供的第一个全局变量。￥USER保存了关于执行当前脚本的用户信息。而其他全局变量包括：</p>
+<ul>
+<li><p>￥CFG： 保存常用的用户设置</p>
+</li>
+<li><p>￥DB： 跟数据库的连接</p>
+</li>
+<li><p>￥SESSION： 封装了PHP的session</p>
+</li>
+<li><p>￥COURSE： 当前请求所对应的课程。</p>
+</li>
+</ul>
+<p>当然不止这些，有一些其他的我们会在下面提到。</p>
+<p>你可能会对全局变量感到慌张。然而，请注意，PHP每次只处理一个请求。所以，这些变量并没有想象中的全局。事实上，PHP的全局变量可以被看做是线程安全的注册表模式，这就是Moodle怎么去使用它们的。 让最常用的对象始终可见是非常方便的，因为你不需要把它们作为参数传入到每一个函数和方法中去。这个方法很少被滥用。</p>
+<p>事情没想象的简单<br>这行代码同时也揭示了一点：任何事情都不是那么简单。显示一个用户名远比轻易地把￥USER-&gt;firstname，~，￥USER-&gt;lastname拼接起来复杂的多。学校或许有规定只允许显示名字的其中一部分，况且许多不同的文化对于名字显示的顺序也有不同的习惯。所以，根据这些规则，才会有针对它的不同配置和一个用来组装全名的函数。<br>当然在时间上也会有同样的问题，不同的用户可能会处在不同的时区上。Moodle把所有的时间都储存为Unix时间戳，这种时间戳是一个整数，所以所有的数据库都支持。然后再调用userdate这个函数在特定的时区还有设置下，显示出时间。</p>
+<p>Line 7：日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_to_log(SITEID, &apos;local_greet&apos;, &apos;begreeted&apos;,</span><br><span class="line"></span><br><span class="line">        &apos;local/greet/index.php?name=&apos; . urlencode($name));    * 7</span><br></pre></td></tr></table></figure>
+<p>Moodle中所有重要的操作都会被记录在日志中，而这个日志会被写到数据库的一个表中，这是一种折中的方式，这让复杂的分析变得容易，并且Moodle 在可以提供比较详细的报告。但是对于一个大规模、高访问量的网站来说这却是一个性能的问题。记录日志的表格可能会变得非常巨大，这使得数据库的备份会变的非常困难，且对于日志的查询也会变得非常慢。在日志的表中还存在着写入竞争。这些问题可以通过不同的方式得以缓解。比如批量写，存档或者删除旧的记录，把他们从主数据库中移除。</p>
+<p><strong>13.4 页面生成</strong><br>页面生成主要是通过两个全局对象来处理</p>
+<p>Line 8 ：$PAGE 全局变量</p>
+<p>$PAGE 保存着要被输出的页面信息。这个信息在所有产生HTML的代码中都可以轻易获得。在这个脚本中，必须明确的指明当前的上下文是什么。（在某些情况，require_login函数可能会自动的帮你设置好）这个页面的URL也必须被明确。这或许看起来没什么必要，但或许你可能会使用不同的URL 来获取同一页面。如果你喜欢的话，你可以把传递给set_url的URL规范成一个永久链接。页面的标题也要被被设置。这样HTML的head元素就被构建出来了。</p>
+<p>Line 9 ： MOODLE URL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$PAGE-&gt;set_url(new moodle_url(&apos;/local/greet/index.php&apos;),</span><br><span class="line"></span><br><span class="line">        array(&apos;name&apos; =&gt; $name));                              * 9</span><br></pre></td></tr></table></figure>
+<p>顺便说一句，上面用过的add_to_log 并没有使用这个辅助类。确实，日志API 不能够接受moodle_url 对象。这种不一致性是一个像Moodle 一样老的code-base的典型特征。</p>
+<p>Line 10 : 国际化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$PAGE-&gt;set_title(get_string(&apos;welcome&apos;, &apos;local_greet&apos;));        10</span><br></pre></td></tr></table></figure>
+<p>Moodle 使用自己的系统使它来支持多语言。或许现在有许多的PHP国际化库，但是在2002年我刚实现这个任务的时候，并没有任何库可以实现该任务。这个系统是围绕着get_string 函数构成的。字符串被一个键和插件的Frankenstyle名字唯一确定。就像你在第十二行看到的，完全可以把值插入到字符串中。（多值在PHP中通过数组和对象来处理）。</p>
+<p>字符串会在一个语言文件中被查找，这些语言文件其实就是一个PHP数组。这是我们插件的语言文件local/greet/lang/en/local_greet.php：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">$string[&apos;greet:begreeted&apos;] = &apos;Be greeted by the hello world example&apos;;</span><br><span class="line"></span><br><span class="line">$string[&apos;welcome&apos;] = &apos;Welcome&apos;;</span><br><span class="line"></span><br><span class="line">$string[&apos;greet&apos;] = &apos;Hello, &#123;$a&#125;!&apos;;</span><br><span class="line"></span><br><span class="line">$string[&apos;pluginname&apos;] = &apos;Hello world example&apos;;</span><br></pre></td></tr></table></figure></p>
+<p>注意到，除了两个我们脚本中用到的字符串，这里还给某个能力了一个名字，还有这个插件显示在用户界面上的名字。<br>不同语言由两个字母的国家码唯一确定（这里是en）。语言包或衍生于其他语言包。比如说fr_ca（加拿大法语）语言包声明了fr（法语）作为它的母语，所以它只需要定义不同于法语的部分。因为Moodle诞生于澳大利亚，而en以为着是英式英语，所以导致en_us（美式英语）从他衍生过来。</p>
+<p>同样，这个看似简单的get_stringAPI 把巨大的复杂性从插件开发者面前隐藏起来，包括计算出当前的语言（这可能由用户的偏好，或者特定课程的设置来决定）以及搜索语言包以及所有母语言包来找到这个字符串。</p>
+<p>语言包制作以及协同翻译在【<a href="http://lang.moodle.org" target="_blank" rel="noopener">http://lang.moodle.org</a> 】上管理，Moodle用它们只做了一个可定制插件（Local_amos）。它使用Git和数据库作为存储语言文件的后端。并保留了所有历史版本。</p>
+<p>Line 11： 开始输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $OUTPUT-&gt;header();                                       /11</span><br></pre></td></tr></table></figure>
+<p>这又是一个看似平淡无奇的一行，然而它所做的工作可比看起来的多得多。这里最关键的一点在于，在任何的输出之前，页面所采用的主题（皮肤）必须被计算出来。这取决于页面上下文以及用户偏好的组合。然而， $PAGE-&gt;context 只在第8行被设置，所以$OUTPUT 全局变量不能再脚本一开始就初始化。为了解决这个问题，我们使用了一些PHP的小技巧，根据 $PAGE的信息，在第一次调用输出方法的时候才构造合适的 $OUTPUT。<br>另一件需要考虑的事情是，Moodle中的每一个界面都有可能包含块（blocks）。这些块是一部分可以额外配置的内容，通常被显示在主要内容的左侧或右侧。（它们也是插件的一种）同时，具体块在哪里被显示出来是通过一种弹性的方式（管理员可控制的），由页面的上下文和其他页面的标识来决定的。所以，输出的另一个准备工作就是调用 $PAGE-&gt;blocks-&gt;load_block()。<br>当所有必要的信息都被准备好了以后，主题插件（控制页面的整体外观）被调用以产生页面的整体布局，包括任何标准需要的头部和页脚。这个调用同时也在负责在HTML中对应的位置填入块中的内容。在布局的中间，或有一个div，这个页面特定的内容会显示在这里。当HTML的布局产生之后，在主要内容的div上一切两半。在第一半完成后，其他的部分被存储起来，由$OUTPUT-&gt;footer()返回。</p>
+<p>Line 12： 输出页面Body<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo $OUTPUT-&gt;box(get_string(&apos;greet&apos;, &apos;local_greet&apos;,</span><br><span class="line">        format_string($name)));                               / 12</span><br></pre></td></tr></table></figure></p>
+<p>这一行输出了整个页面的主体。这里仅仅把我们的问候显示在了这一行输出了整个页面的主体。这里仅仅把我们的问候显示在一个盒子里。这一句问候，同样，是一个本地化过的字符串，因为这时我们已经用了一个值替换掉了占位符。内核渲染器$OUTPUT 提供了许多像box 这样方便的方法，以高级术语来描述我们所需要的输出。不同的主题可以控制什么样的HTML 元素真正地被用来构建这个盒子。<br>首先输出的内容是通过format_string 函数处理过的用户的信息（$name ）。这是XSS<br>（Cross-Site Scripting，跨站脚本攻击）保护的另一部分。另外这也使文本过滤器产生作<br>用。使用过滤器的一个例子就是LaTex 过滤器，它把像$$x + 1$$这样的输入转换成一个公<br>式的图片。我会简单的提到，但是不会进行详细的解释，实际上，这里有三个不同的函数（s，<br>format_string 和format_text）进行字符串处理。具体使用哪个取决于输出内容的具体类型。</p>
+<p>Line 13: 结束输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $OUTPUT-&gt;footer();                                       / 13</span><br></pre></td></tr></table></figure>
+<p>最后，页脚被输出。这个例子并没有显示出来，但是Moodle 会记录所有这个页面需要的JS 文件，然后把它们都添加到页脚上。这是一个经典的好实现。这样用户就可以先看到页面， 而不必等待所有的JS 加载完成。一个开发者可以像$PAGE-&gt;requires-&gt;js(‘/local/greet/cooleffect.js’)这样用API 添加JS 。</p>
+<p>这个脚本应该混杂逻辑和显示吗？<br>很显然，吧进行输出的代码直接写在index.php里，及时这是一个高级的抽象，也会限制主体对于输出更改的灵活性。这是另一个Moodle老旧code-base 的现象。全局变量$OUTPUT 在2010年的时候才被引入。当时是把它设计成拯救旧代码的垫脚石。在这之前，所有处理输出和控制器的代码都写在了同一个文件中。而它成功的分离了这两类代码。这也解释了那个十分丑陋的渲染方法—— 先把整个页面布局产生出来，再劈成两半，才使得脚本任何自己的输出能够正确地显示在页首和页脚之间。自从把视图代码从脚本中分离出来，放到一个Moodle 叫做渲染器的东西中后，主题就可以<br>完全（或者部分）重写一个给定脚本的视图了。<br>一个很小的重构就可以把所有在index.php 中处理输出的代码抽出，转移到一个渲染器里面。<br>那么在index.php 的最后（11到13行）就变为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$output = $PAGE-&gt;get_renderer(&apos;local_greet&apos;);</span><br><span class="line">echo $output-&gt;greeting_page($name);</span><br></pre></td></tr></table></figure>
+<p>然后，我们就有了一个新文件local/greet/renderer.php:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class local_greet_renderer extends plugin_renderer_base &#123;</span><br><span class="line">    public function greeting_page($name) &#123;</span><br><span class="line">        $output = &apos;&apos;;</span><br><span class="line">        $output .= $this-&gt;header();</span><br><span class="line">        $output .= $this-&gt;box(get_string(&apos;greet&apos;, &apos;local_greet&apos;, $name));</span><br><span class="line">        $output .= $this-&gt;footer();</span><br><span class="line">        return $output;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果一个主题想完全改变这个输出，它可以定义一个这个渲染器的子类，并且覆盖掉greeting_page 这个方法。$PAGE-&gt;get_renderer()根据当前的主题来选择合适的渲染器类进行初始化。所以输出（视图）代码完全地被从index.php 的控制器代码中分离出来，这个插件也从典型的Moodle 遗留代码被重构成干净的MVC 结构。</p>
+<p>13.5 数据库的抽象</p>
+<p>我们所用做示范的”Hello World”脚本太简单了以至于它根本不需要进行数据库的访问。然而有一些Moodle的库确实有调用数据库的需求。现在，我将简单的介绍一下Moodle的数据库层。</p>
+<p>在过去，Moodle的数据库抽象层基于ADOdb库，但这给我们带来了种种麻烦。并且这个库的代码中多出来了额外的一层，对我们的性能产生了严重的影响。所以，在Moodle2.0中，我们将之转换到我们自己的数据抽象层，它只不过把PHP的数据库封装起来罢了。</p>
+<p>moodle_database类</p>
+<p>整个库的核心是moodle_database类。它定义了$DB 全局变量提供的用于连接数据库的接口。一个典型的用法是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$course = $DB-&gt;get_record(&apos;course&apos;, array(&apos;id&apos; =&gt; $courseid));</span><br></pre></td></tr></table></figure></p>
+<p>它翻译成SQL语句就是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM mdl_course WHERE id = $courseid;</span><br></pre></td></tr></table></figure></p>
+<p>这将返回一个公开属性的PHP对象，所以你可以简单地像$course-&gt;id, $course-&gt;fullname等等来获取相应的属性。<br>这样简单的方法可以处理最基本的查询、更改和插入。有些时候，做一些更加复杂的SQL查询是很必要的，比如生成报告。在这样的情况下，有许多方法来执行任意的SQL 语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$courseswithactivitycounts = $DB-&gt;get_records_sql(</span><br><span class="line">   &apos;SELECT c.id, &apos; . $DB-&gt;sql_concat(&apos;shortname&apos;, &quot;&apos; &apos;&quot;, &apos;fullname&apos;) . &apos; AS coursename,</span><br><span class="line">        COUNT(1) AS activitycount</span><br><span class="line">   FROM &#123;course&#125; c</span><br><span class="line">   JOIN &#123;course_modules&#125; cm ON cm.course = c.id</span><br><span class="line">   WHERE c.category = :categoryid</span><br><span class="line">   GROUP BY c.id, c.shortname, c.fullname ORDER BY c.shortname, c.fullname&apos;,</span><br><span class="line">   array(&apos;categoryid&apos; =&gt; $category));</span><br></pre></td></tr></table></figure></p>
+<p>这里有几点需要注意：</p>
+<ul>
+<li>表名需要被{}包起来，这样库函数才能找到它们，并且加上前缀。</li>
+<li>库函数使用占位符来将值填入SQL 语句中。在某些场合，我们使用了底层数据库驱动的功能。在其他情况下，这些值必须通过转译，然后利用字符串操作将其插入到SQL语句中。库函数支持两种填充方法，一种使用命名占位符（就像上面那样），还有一种使用?作为占位符的匿名方式。</li>
+<li>为了让查询在我们所有支持的数据库中都得以实现，只有标准SQL 中的一个安全子集被筛选出来以供使用。比如，你能看到我使用了关键字AS 来对列名作别名处理，但是从来没有对表名的别名。这两个用法规则都十分的重要。</li>
+<li>即使是这样，仍然有一些情况，没有任何一个标准SQL 的子集可以在所有我们需要支持的数据库上都能运作。比如说，每一种数据库都用完全不同的方式来处理字符串拼接。在这些时候，我们提供一些兼容功能来产生正确的SQL 语句。</li>
+</ul>
+<p>定义数据库结构</p>
+<p>另一个数据库系统之间差异很大的地方就是，创建表的SQL 语法。为了克服这个问题，每一个Moodle 插件（包括Moodle 内核）都在一个XML 文件中定义了需要的数据库表。Moodle 安装系统会解析install.xml 文件，并且利用它们包含的信息来创建所需的表和索引。有一个Moodle 内建的叫做XMLDB 的工具，它可以用来帮助开发者创建和编辑这些安装文件。<br>如果在两个不同的Moodle 发布版（或者是一个插件）中数据库结构需要更改，那么开发者就需要负责编写代码（使用一个额外提供DDL 方法的数据库对象）来更新这些数据库结构，同时必须保持所有的用户数据。所以，Moodle 总是在版本升级的时候总是进行自我更新，简化了管理员的维护成本。<br>另一个有争议的地方是，鉴于Moodle 最开始使用的是MySQL 3这个版本的事实，Moodle数据库没有使用外键。这就有可能使得许多容易产生BUG 的行为很难被检测到，但是现代数据库却很容易检测到它们。困难在于，我们的用户不用外键使用Moodle 站点已经很多年了，所以现在几乎肯定有数据不一致性存在。如果现在要添加这些键，不进行一次非常困难的清理工作是不可能的。尽管如此，自从XMLDB 系统加入到Moodle 1.7（在2006年！）以来，这些install.xml 文件已经规定了外键可以存在的定义。我们始终希望，总有一天，通过必要的工作，可以允许我们在安装过程中创建这些键。</p>
+</div></article></div></main><footer><div class="paginator"><a class="prev" href="/2018/09/28/MediaWiki/">prev</a><a class="next" href="/2018/09/28/Nginx/">next</a></div><div class="copyright"><p>&copy; 2018 - 2020 <a href="https://blog.ccao.cc">Chun</a><br>Powered by <a href="https://hexo.io/" rel="noreferrer" target="_blank">Hexo</a></p></div></footer></div></div><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-139057960-2']);
+_gaq.push(['_trackPageview']);
+
+(function () {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script><script src="https://cdnjs.cloudflare.com/ajax/libs/barba.js/1.0.0/barba.min.js"></script><script>document.addEventListener('DOMContentLoaded', function() {
+    Barba.Pjax.start()
+})</script></body></html>

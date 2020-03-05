@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="index, follow"><title>Wesnoth • 不会写代码的架构师不是好程序猿</title><meta name="description" content="Wesnoth - 老曹同学"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="https://unpkg.com/nanoreset@3.0.1/nanoreset.min.css"><link rel="stylesheet" href="/css/theme.css"><link rel="search" type="application/opensearchdescription+xml" href="/atom.xml" title="不会写代码的架构师不是好程序猿"></head><body><div class="wrap" id="barba-wrapper"><header><h1 class="branding"><a href="/" title="不会写代码的架构师不是好程序猿">不会写代码的架构师不是好程序猿</a></h1><ul class="nav nav-list"><li class="nav-list-item"><a class="nav-list-link no-barba" href="/" target="_self">HOME</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="/about" target="_self">ABOUT</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="https://github.com/caochun/" target="_blank">GITHUB</a></li><li class="nav-list-item"><a class="nav-list-link no-barba" href="/atom.xml" target="_self">RSS</a></li></ul></header><div class="barba-container"><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Wesnoth</h1><div class="post-info"><a></a>2018-09-28</div><div class="post-content"><h1 id="韦诺之战-Battle-For-Wesnoth"><a href="#韦诺之战-Battle-For-Wesnoth" class="headerlink" title="韦诺之战 Battle For Wesnoth"></a>韦诺之战 Battle For Wesnoth</h1><p>编程往往被认为是一种直接的问题求解的活动。开发人员得到要求然后用代码设计出解决方案。“美”通常是基于技术实现的优雅和效率；这本书充满了出色的例子。然而，在即时计算功能之外，代码可以对人的生活产生深远的影响。他可以启发人们取参与并且创造出新的内容。不幸的是，存在严重的障碍阻止个体参与到一个项目中。</p>
+<p>大多数的编程语言需要利用极其重要的技术专业知识，这些知识超出许多人的理解。另外，增强代码的可达性在技术上是困难的并且对许多程序是不必要的。它很少转换成干净的代码脚本或者程序解决方案。获得可达性要求在项目和程序设计方面有强大的先见之明，通常对于正常的程序设计标准是违反直觉的。另外大多数的项目依赖一个由熟练的专业人员组成的团队以在一个较高的层次上运行。它们不需要另外的编程资源。因此，代码的可达性成为了一种反思，如果还被考虑的话。</p>
+<p>我们的项目，“韦诺之战”（以下简称为Wesnoth），尝试从源头解决这个问题。这个程序是一个回合制幻想策略游戏，产生自一个基于GPL2授权的开源模型。这个项目取得了一定成功，到写这篇文章的时间为止已经有400万次下载。尽管这是一个给人留下深刻印象的数字，我们相信我们的项目的真正的美丽在于它的开发模型。这个模型允许一群水平参次不齐的志愿者以一种有效的方式互动。</p>
+<p>提高可达性不是一个由开发者设定的模糊的目标，而被看作是为了这个项目的存活所必需的。Wesnoth的开源方法意味着这个项目不可能立刻就有大量高水平的开发者参与其中。让这个项目吸引许多不同水平的贡献者，将会保证它长期的生存能力。</p>
+<p>我们的开发者尝试为从最早的版本扩大可达性奠定基础。这将对程序设计架构的所有方面产生不可否认的后果。重要的决定基本上也要考虑到这个目标。这一章将会提供对我们的程序的深入研究，重点在于提高可达性的种种举措。</p>
+<p>这一章节的第一部分是关于这个项目的程序设计的概要，包含它的语言、依赖和架构。第二部分将着重于Wesnoth的独特的数据存储语言，通常被称作Wesnoth标记语言（WML），将会解释WML的特定功能，特别是它对游戏中单位的影响。下一部分将介绍多人模式的实现和外部程序。本章的结束部分将会对我们的整体架构以及拓宽参与面的种种挑战做一个简单的总结。</p>
+<h2 id="25-1-项目简介"><a href="#25-1-项目简介" class="headerlink" title="25.1 项目简介"></a>25.1 项目简介</h2><p>Wesnoth的核心引擎的语言是C++，目前为止一共大约200000行代码。这就是核心游戏引擎，占据几乎一半的基本代码。这个程序也允许游戏内容被一种被称作“Wesnoth标记语言（WML）”的独特的数据语言所定义。这个游戏还包含另外250000行WML代码。这一部分随着游戏发展而不断变化。随着程序变得成熟，用C++硬编码的游戏内容逐渐被重写从而WML能够被用来定义它的工作。图25.1给出了这个程序架构的粗糙的表示；绿色的区域由Wesnoth的开发者维护，而白色的区域是外部依赖。</p>
+<p><img src="/cdn/images/aosabook/66.png" alt="">                                            </p>
+<p>总体上，这个项目尝试在最大多数情况下最小化依赖，从而最大化应用的可移植性。另外一个好处是降低程序的复杂度，减少开发者学习大量第三方API的细微之处的需要。同时，谨慎地使用一些依赖也能起到同样的效果。比如说，Wesnoth使用Simple Directmedia Layer（SDL）来负责视频、I/O和事件处理。选择SDL的原因是它便于使用而且提供跨平台的I/O接口。这使得它可移植到很多平台，而不是在不同的平台针对特定的API写不同的代码。然而，这也有一定的代价，更难利用一些平台特有的功能。SDL也有一些关联库被Wesnoth用于不同的目的：              </p>
+<ul>
+<li>SDL_Mixer用于音频和声音    </li>
+<li>SDL_Image用于加载PNG和其他图片格式 </li>
+<li>SDL_Net用于网络I/O</li>
+</ul>
+<p>另外，“Wesnoth”还使用以下的其他库：             </p>
+<ul>
+<li>Boost用于提供多种高级C++特性           </li>
+<li>Pango with Cairo用于国际化字体          </li>
+<li>zlib用于压缩         </li>
+<li>Python和Lua用于脚本支持              </li>
+<li>GNU gettext用于国际化          </li>
+</ul>
+<p>纵观Wesnoth的引擎，WML对象——即带有子节点的字符串字典——的使用相当的频繁。许多对象可以由WML节点构造，也可以序列化成WML节点。引擎的某些部分就把数据存储在这种基于WML字典的形式，直接解释而不是经过语法分析转化成C++数据结构。</p>
+<p>Wesnoth使用几个重要的子系统，其中大多数都是字包含的。这种分段式的结构对于可达性是有利的。感兴趣的人可以很容易地在某一特定区域写代码，引入变化而不破坏程序的其余部分。这些重要的子系统包括：              </p>
+<ul>
+<li>WML语法分析器和预处理器               </li>
+<li>基本I/O模块，抽象了底层库和系统调用——包含视频模块、声音模块、网络模块          </li>
+<li>GUI模块，包含按钮、列表、菜单等等窗口小部件的实现            </li>
+<li>显示模块，用于游戏板、单位、动画等等的渲染             </li>
+<li>AI模块              </li>
+<li>寻路模块，包含许多处理六边形游戏板的实用函数          </li>
+<li>地图生成模块，用于生成不同的随机地图              </li>
+</ul>
+<p>还有不同的模块用于控制游戏流程的不同部分：               </p>
+<ul>
+<li>标题画面模块，用于控制标题画面的显示           </li>
+<li>故事线模块，用于展示剪辑场景序列            </li>
+<li>休息室模块，用于显示并且控制多人游戏服务器的游戏启动               </li>
+<li>“play game”模块，控制主要的游戏操作  </li>
+</ul>
+<p>“play game”模块和主显示模块是Wesnoth中最大的两个模块。他们的目的是定义得最模糊的，因为它们的功能是不停变化的，因此很难给出一个清晰的说明。结果，这些模块经常在游戏发展的历史中有陷入Blob反面模式的危险——即变成没有清晰定义行为的巨大的主导的部分。显示和游戏操作模块中的代码被定期复查，看有没有某部分代码可以单独划分成一个模块。</p>
+<p>还有其他一些附属特性，虽然是整个项目的一部分，但是和主程序是分开的。其中包含一个多玩家服务器，用于多玩家联网游戏；以及一个游戏内容服务器，允许用户上传他们的游戏内容到一个公用的服务器并和他们分享。这些部分的代码都是用C++写成的。</p>
+<h2 id="25-2-Wesnoth标记语言"><a href="#25-2-Wesnoth标记语言" class="headerlink" title="25.2 Wesnoth标记语言"></a>25.2 Wesnoth标记语言</h2><p>作为一个可扩展的游戏引擎，Wesnoth使用一种简单的数据语言来存储和加载所有的游戏数据。尽管XML最初被考虑使用，我们决定我们想要一种对非技术用户更友好的、关于视觉数据使用更轻松的数据语言。我们因此开发了我们自己的数据语言，叫做“Wesnoth标记语言（WML）”。在设计这个语言时，我们考虑到技术水平最低的用户：我们的期望是即使是认为Python或HTML吓人的用户也能够理解WML文件。所有Wesnoth游戏数据都存储在WML中，包括游戏单位定义、战役、剧本、GUI定义、以及其他游戏逻辑配置。</p>
+<p>WML和XML有相同的特性：元素和属性，虽然WML不支持元素中的文本、WML属性简单地表示为一个从字符串映射到字符串的字典，而程序逻辑负责属性的解释。下面的一个WML的简单示例是一个游戏中精灵战士单位的简化版定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[unit_type]</span><br><span class="line">    id=Elvish Fighter</span><br><span class="line">    name= _ &quot;Elvish Fighter&quot;</span><br><span class="line">    race=elf</span><br><span class="line">    image=&quot;units/elves-wood/fighter.png&quot;</span><br><span class="line">    profile=&quot;portraits/elves/fighter.png&quot;</span><br><span class="line">    hitpoints=33</span><br><span class="line">    movement_type=woodland</span><br><span class="line">    movement=5</span><br><span class="line">    experience=40</span><br><span class="line">    level=1</span><br><span class="line">    alignment=neutral</span><br><span class="line">    advances_to=Elvish Captain,Elvish Hero</span><br><span class="line">    cost=14</span><br><span class="line">    usage=fighter</span><br><span class="line">    &#123;LESS_NIMBLE_ELF&#125;</span><br><span class="line">    [attack]</span><br><span class="line">        name=sword</span><br><span class="line">        description=_&quot;sword&quot;</span><br><span class="line">        icon=attacks/sword-elven.png</span><br><span class="line">        type=blade</span><br><span class="line">        range=melee</span><br><span class="line">        damage=5</span><br><span class="line">        number=4</span><br><span class="line">    [/attack]</span><br><span class="line">[/unit_type]</span><br></pre></td></tr></table></figure>
+<p>因为国际化在Wesnoth中是很重要的，WML提供了直接支持：带有下划线前缀的属性值是可翻译的。在对WML进行语法分析时，所有可翻译的字符串都是使用GNU ‘’gettext’’转换成字符串翻译后的版本的。</p>
+<p>Wesnoth没有使用许多不同的WML文档，而是选择了把所有主要游戏数据用单个文档呈现给游戏引擎。这样可以用一个全局变量来控制整个文档，在游戏加载过程中比如说所有单位定义都通过在一个’’units’’元素中寻找带有名字’’unit_type’’的元素而被加载。</p>
+<p>虽然所有数据都被存储在单个概念上的WML文档中，把它全部放进单个文件将会是难以控制的。因此在语法分析之前，Wesnoth支持一个运行在WML之上的预处理器。这个预处理器允许一个文件包含另一个文件的内容，或整个目录。比如说：’’{gui/default/window/}’’将会包含所有位于’’gui/default/window’’的’’.cfg’’文件。</p>
+<p>既然WML可以变得非常冗长，这个预处理器还允许宏定义来进行浓缩。比如说，精灵战士中的’’{LESS_NIMBLE_ELF}’’调用是一个对宏的调用，其使得某些精灵单位在某些条件下变得灵活度降低，比如当精灵单位停留在森林中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#define LESS_NIMBLE_ELF</span><br><span class="line">    [defense]</span><br><span class="line">        forest=40</span><br><span class="line">    [/defense]</span><br><span class="line">#enddef</span><br></pre></td></tr></table></figure>
+<p>这种设计的优点在于使得游戏引擎对WML文档是怎样分解成文件的是不可知的。决定如何组织和划分所有游戏数据到不同文件和目录中是WML作者的责任。</p>
+<p>当游戏引擎加载WML文件时，也会根据不同游戏设定定义一些预处理器符号。比如说，一个Wesnoth战役可以定义不同难度设置，每种难度设置会导致不同预处理器符号被定义。比如说，一种区别难度的最常见方式是区别给予对手的资源量（用黄金来表示）。为了实现这个目的，有如下的宏定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#define GOLD EASY_AMOUNT NORMAL_AMOUNT HARD_AMOUNT</span><br><span class="line">  #ifdef EASY</span><br><span class="line">    gold=&#123;EASY_AMOUNT&#125;</span><br><span class="line">  #endif</span><br><span class="line">  #ifdef NORMAL</span><br><span class="line">    gold=&#123;NORMAL_AMOUNT&#125;</span><br><span class="line">  #endif</span><br><span class="line">  #ifdef HARD</span><br><span class="line">    gold=&#123;HARD_AMOUNT&#125;</span><br><span class="line">  #endif</span><br><span class="line">#enddef</span><br></pre></td></tr></table></figure>
+<p>这个宏可以通过例如使用对手的定义中的’’{GOLD 50 100 200}’’被调用，从而定义了不同难度等级对手拥有的黄金。</p>
+<p>因为WML是有条件地被处理的，如果任何提供给WML文档的符号在Wesnoth引擎执行的过程中发生了改变，整个WML文档都必须被重新加载和处理。比如说，当用户启动游戏时，WML文档被加载，可用的战役以及其他的东西也被加载。但是那时，如果用户选择开始一个战役并选定某个难度等级——比如简单——那么整个文档将必须在EASY被定义后被重载。</p>
+<p>这种设计是很便利的因为单个文档包含了所有游戏数据，而且符号可以让人简单地开始WML文档的配置。然而，作为一个成功的项目，越来越多的内容对于Wesnoth是可得到的，包括许多可下载的内容——所有的内容最终都被插入到核心文档树中——这意味着WML文档的大小将以GB为单位。这成为了Wesnoth性能上的问题：加载文档在某些电脑上可能会花费一分钟的时间，这样的话每次文档需要被重新加载时都会引起游戏中延迟。另外，它使用巨大的内存。一些措施可以用来克服这个问题：当一个战役被加载时，预处理器中有那个战役所特有的符号定义其中。这意味着任何特属于那个战役的内容都可以用#ifdef来确保只有当那个战役被需要的时候才会被使用。</p>
+<p>另外，Wesnoth使用一种缓存机制，根据一组给定的键定义缓存WML文档的完全预处理过的版本。自然这种缓存系统必须检查所有WML文件的时间戳，从而如果任何WML文件被修改过了，缓存的文档将会重新生成。</p>
+<h2 id="25-3-Wesnoth中的单位"><a href="#25-3-Wesnoth中的单位" class="headerlink" title="25.3 Wesnoth中的单位"></a>25.3 Wesnoth中的单位</h2><p>Wesnoth中的主人公是它的单位(unit)。一个精灵战士(Elvish Fighter)和一个精灵巫师(Elvish Shaman)可能会与一个巨人战士(Troll Warrior)和一个兽人步兵(Orcish Grunt)战斗。所有的单位都有着相同的基本行为，但是许多单位有着能够改变正常的游戏流程的特殊能力。举个例子，一个巨人每个回合回复少许体力值，一个精灵巫师使用一个“缠结的根”(entangling root)来减缓对手的行动，一个树人在森林中可以隐身。</p>
+<p>在游戏引擎中最好的代表这一点的方法是什么？有人可能会想创建一个C++的’’unit’’基类，不同类型的单位是它的派生类。比方说，一个’’wose_unit’’类可以派生自’’unit’’，’’unit’’可以有一个虚函数，’’bool is_invisible() const’’，返回值为false，’’wose_unit’’重载这个方法，如果单位在森林中则返回值为true。</p>
+<p>这样的一种方法对于一个有着有限的规则集的游戏来说是自然是适用的。不幸的是，Wesnoth是一个相当大的游戏，这样一种方法是不易扩展的。如果一个人想要用这种方法创造一种新的单位，那么就需要像游戏中加入一个新的C++类。另外，这种方法不会使得其他的特征结合得很好：如果你有一个可以再生、可以用一张网减缓敌人的行动、可以在森林中隐身的单位，该怎么做？你将不得不写一个全新的类，复制其他类中的代码。</p>
+<p>Wesnoth的单位系统完全不适用继承来完成这个任务。它使用一个’’unit’’类来表示单位的实例，和一个’’unit_type’’类，代表某一类的所有单位共享的不变的特征。’’unit’’类有一个指向这个对象的类型的指针。所有可能的’’unit_type’’对象存储在一个全球的字典中，当主WML文件被在加载时，它被加载进游戏。</p>
+<p>一个单位有着那个单位拥有的所有能力的列表。比如说，一个巨人拥有能每回合回复体力值的“再生”能力。一个蜥蜴人散兵(Saurian Skirmisher)拥有能够越过敌境线的“散兵”能力。对这些能力的识别被植入了引擎——比如说，寻路算法将会检查一个单位的“散兵”的标识来看它是否能够自由地越过敌境线。这个方法允许一个人来加入新的单位，这可以拥有引擎规定的所有能力的组合，只需要编辑WML。当然，除非更改游戏引擎，这种方法不允许加入全新的能力和单位行为。</p>
+<p>另外，Wesnoth中的每个单位可以有任意多种方法发动进攻。比如说，一个精灵射手(Elvish Archer)有一个长距离弓箭攻击和一个短距离刀攻击。每一种攻击都有不同的伤害值和特性。为代表一个攻击，有一个’’attack_type’’类，每一个’’unit_type’’实例包含一系列可能的’’attack_type’’对象。</p>
+<p>为了给每个单位更多的特性，Wesnoth有一个特征叫做“特性”(trait)。一旦招募，大多数的单位从一个预先定义的列表被随机指定两种特性。比如说，一个“强大”(strong)的单位可以使用它的近战攻击造成更大的伤害，而一个“智力”(intelligent)单位升级需要更少的经验值。而且，在游戏中，单位可以获取装备来使得自己更强大。比如说，一个单位可以装备上到来使得自己的攻击造成更多的伤害。为了实现特性和装备，Wesnoth允许对单位做修改，具体就是对单位的数据即WML定义做修改。比如说，“强大”特性给予“强大”单位更多的伤害值当发动近战攻击时，当使用远程攻击时则不会。</p>
+<p>允许利用WML完全可设置的单位行为将会是一个令人追求的目标，所以思考Wesnoth为什么没有实现这样一个目标是有指导性的。WML需要变得更加灵活如果它想要允许任意的单位行为。那样的话，WML将不能是一个面向数据的语言，而不得不被扩展成一个成熟的编程语言，这对于许多有抱负的贡献者来说是令人畏惧的。</p>
+<p>另外，Wesnoth的AI，由C++开发，能够识别游戏中出现的能力。它考虑了再生、隐身等等能力，试图操纵它的单位来最好地利用这些不同的能力。即使一个单位能力能用WML创建出来，却很难让AI变得足够高级来识别这种能力以便利用它。实现一种能力却不被AI所计算，这不是一个令人满意的实现。相似地，用WML实现一种能力然后不得不修改用C++编写的AI来计入这种能力将会是笨拙的。因此，让单位可以用WML编辑，但是让能力“硬写入”到游戏引擎被认为是一种合理的妥协，这种妥协对于Wesnoth的具体要求是最适应的。</p>
+<h2 id="25-4-Wesnoth的多人游戏实现"><a href="#25-4-Wesnoth的多人游戏实现" class="headerlink" title="25.4 Wesnoth的多人游戏实现"></a>25.4 Wesnoth的多人游戏实现</h2><p>Wesnoth多人游戏实现使用一种尽可能简单的方法来在Wesnoth中实现多人游戏。它尝试缓解对服务器的恶意攻击，但没有努力去预防作弊。一个Wesnoth游戏的任何行动——单位的移动，进攻一个敌人，招募一个单位等等——可以被存储为一个WML节点。比如说一个移动单位的命令可以像这样被存入WML：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[move]</span><br><span class="line">    x=&quot;11,11,10,9,8,7&quot;</span><br><span class="line">    y=&quot;6,7,7,8,8,9&quot;</span><br><span class="line">[/move]</span><br></pre></td></tr></table></figure>
+<p>这展现了一个单位由于一个玩家的指令而移动的路径。这个游戏有一个功能来执行给予它任何这样的WML指令。这很有用，因为它意味着一个完全的回放可以被存储，通过存储游戏的初始状态和之后的所有执行指令。能够回放游戏对游戏双方观察对方的游戏和都是有用的，而且有助于上传bug报告。</p>
+<p>我们决定这个社区将会试着着重对于Wesnoth联网多人游戏的友好、随意的游戏。这个项目将不会努力去预防作弊，而不是向试着破坏作弊预防系统反社会的黑客组织一场技术层面的战斗。对其他多人联网的游戏的分析显示竞争性的排名系统是反社会行为的一个关键来源。在服务器上故意防止这种功能将会大大地减少个体去作弊的动机。另外，版主试着鼓励一个积极、健康的游戏社区，这个社区中玩家与玩家有着良好的人际关系。这些努力的结果被认为是成功的，因为迄今为止恶意侵入游戏的举动大部分都是隔离的。</p>
+<p>Wesnoth的多人联网实现包含一个典型的C/S架构。一个服务器，被称为wesnothd，接受来自Wesnoth客户的连接，并且发送给客户可能的游戏的总结。Wesnoth将会向玩家展示一个“大厅”(lobby)，玩家可以选择加入一场游戏或者创建一场新的游戏等待其他人来加入。一旦玩家进入游戏，并且游戏开始，每个Wesnoth的实例将会产生描述玩家行动的WML指令。这些指令被发送到服务器，服务器把它们转发给游戏中的所有其他客户。因此，服务器将会充当一个很单薄(thin)、很简单的转发功能。回放系统被使用在其他客户上来执行WML指令。因为Wesnoth是一个回合制游戏，所有的网络连接使用TCP/IP协议。</p>
+<p>这种系统允许旁观者很轻易地旁观一场游戏。一个旁观者可以在途中加入游戏，在这种情形下服务器将会发送代表游戏初始状态的WML，紧跟着所有自游戏开始已经被执行的指令的历史。这允许新的旁观者跟上游戏状态的进度。他们可以看到游戏的历史，虽然对于旁观者到达游戏的目前状态是需要时间的——指令的历史可以快进但仍然消耗时间。另一种方法是让其中一个客户产生游戏当前状态的WML快照(snapshot)并且发送给新的观察者。然而，这个方法将会基于旁观者加重客户的负载，并且通过让许多旁观者加入游戏会助长DoS攻击。</p>
+<p>当然，因为Wesnoth客户不与其他客户共享任何游戏状态，只发送指令，很重要的是它们遵守游戏的规则。服务器根据版本被分块，只有使用这个版本的游戏的玩家才能与这个版本的服务器进行交互。如果它们的客户和其他玩家失去同步，玩家被立刻提醒。这也是预防作弊的一个有效的系统。虽然对一个玩家来说通过修改他们的客户是相当容易的，任何版本上的差异将会被立刻识别给可以被处理的玩家。</p>
+<h2 id="25-5-结语"><a href="#25-5-结语" class="headerlink" title="25.5 结语"></a>25.5 结语</h2><p>我们相信，作为一个程序，韦诺之战的美在于它是怎样使得让一大群个体可以完成编程的工作的。为了实现这个目标，这个项目通常作出在代码中看起来不很优雅的拖鞋。应该被注意到，这个项目的许多更加有才能的程序员对WML低效率的语法感到头疼。然而，这个妥协实现了这个项目最大的成功之一。今天，Wesnoth可以因为数以百计的用户定制的战役和剧本而感到自豪，这些战役大多数都是由几乎没有编程经验的用户所创建的。而且，它激励了许多人选择编程作为一种职业，使用这个项目作为一种学习工具。这些是很少有项目可以企及的成就。</p>
+<p>读者可以从Wesnoth的努力中学习到的一个关键的教训是考虑少有经验的程序员面临的挑战。它需要理解什么阻止了贡献者完成编程任务和提升他们的技能。比如说一个个体可能想要为一个项目做贡献，但是没有任何编程技能。专业的技术编辑器，比如说’’emacs’’和’’vim’’拥有一个陡峭的学习曲线，这对于个体来说是令人畏惧的。因此，WML被设计来允许一个简单的文本编辑器来打开它的文件，给予任何人贡献的工具。</p>
+<p>然而，提升一个代码基的可达性并不是一个可以简单实现的目标。没有提升代码的可达性的固定规则。相反，他需要在不同的考虑间作出权衡，这些消极影响是社区必须注意的。这在程序是如何处理依赖关系这一点上是显而易见的。在一些情形，依赖关系可以事实上增加参与的门槛，而在另外一些情形它们可以使得人们可以更方便地贡献。每一个议题都必须分情况讨论。</p>
+<p>我们也需要谨慎地不要夸大Wesnoth的一些成就。这个项目拥有一些其他项目所不能轻易复制的优势。使用代码对于广大群体可达，部分是这个程序的背景所致。作为一个开源程序，Wesnoth在这个方面享受着一些优势。法律上，GNU许可证允许某个人打开一个已存在的文件，理解它是怎样工作的并且做出改变。在这种可能不被其他程序欣赏的文化中，个体被鼓励去实验、学习和分享。不管怎样，我们希望能给所有的开发人员一些可能有帮助的元素并且帮助他们发现编程之美。</p>
+</div></article></div></main><footer><div class="paginator"><a class="prev" href="/2018/09/28/Twisted/">prev</a><a class="next" href="/2018/09/28/Violet/">next</a></div><div class="copyright"><p>&copy; 2018 - 2020 <a href="https://blog.ccao.cc">Chun</a><br>Powered by <a href="https://hexo.io/" rel="noreferrer" target="_blank">Hexo</a></p></div></footer></div></div><script>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-139057960-2']);
+_gaq.push(['_trackPageview']);
+
+(function () {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</script><script src="https://cdnjs.cloudflare.com/ajax/libs/barba.js/1.0.0/barba.min.js"></script><script>document.addEventListener('DOMContentLoaded', function() {
+    Barba.Pjax.start()
+})</script></body></html>
